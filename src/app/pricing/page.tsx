@@ -117,7 +117,7 @@ export default function PricingPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {pricingPlans[0].tiers?.map((tier, index) => (
+                      {pricingPlans[0].tiers.map((tier, index) => (
                         <tr
                           key={index}
                           className="hover:bg-gray-50 transition-colors"

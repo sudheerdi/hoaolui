@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "@/src/components/Sidebar";
-import UserProfile from "@/src/components/UserProfile";
+import Sidebar from "../../components/Sidebar";
+import UserProfile from "../../components/UserProfile";
 import MessageList from "./MessageList";
 import MessageDetails from "./MessageDetails";
 import CreateAnnouncementModal from "./CreateAnnouncementModal";
@@ -61,7 +61,7 @@ export default function MessageBoardScreen() {
       authorAvatar:
         "https://readdy.ai/api/search-image?query=professional%20asian%20man%20with%20glasses%20smiling%20headshot%20portrait%20business%20suit%20clean%20white%20background&width=40&height=40&seq=author2&orientation=squarish",
       date: "Feb 9, 2024",
-      time: "7:15 AM",
+      time: "2:15 PM",
       tag: "Alert",
       priority: "High",
       likes: 45,
@@ -77,7 +77,7 @@ export default function MessageBoardScreen() {
       authorAvatar:
         "https://readdy.ai/api/search-image?query=professional%20blonde%20woman%20smiling%20headshot%20portrait%20business%20attire%20clean%20white%20background&width=40&height=40&seq=author3&orientation=squarish",
       date: "Feb 8, 2024",
-      time: "2:45 PM",
+      time: "10:45 AM",
       tag: "Event",
       priority: "High",
       attachments: [
@@ -100,96 +100,27 @@ export default function MessageBoardScreen() {
       authorAvatar:
         "https://readdy.ai/api/search-image?query=professional%20middle%20aged%20man%20with%20beard%20smiling%20headshot%20portrait%20business%20shirt%20clean%20white%20background&width=40&height=40&seq=author4&orientation=squarish",
       date: "Feb 7, 2024",
-      time: "11:20 AM",
+      time: "3:20 PM",
       tag: "Info",
       priority: "Medium",
-      attachments: [
-        {
-          type: "image",
-          name: "recycling-guide.png",
-          url: "https://readdy.ai/api/search-image?query=colorful%20recycling%20bins%20guide%20infographic%20with%20green%20blue%20yellow%20bins%20and%20sorting%20instructions%20clean%20modern%20design&width=400&height=300&seq=recycle1&orientation=landscape",
-        },
-      ],
       likes: 32,
       comments: 12,
       isRead: true,
     },
     {
       id: "5",
-      title: "Community Garden Project Launch",
+      title: "Security Camera System Upgrade Complete",
       content:
-        "Exciting News!\n\nWe are thrilled to announce the launch of our Community Garden Project! This initiative will transform the vacant lot behind Building C into a beautiful shared garden space.\n\nProject Features:\n• Individual family plots available\n• Shared tool shed and water access\n• Composting area\n• Children's learning garden\n• Herb and flower sections\n\nInterested families can sign up at the management office. Plot rental is $25/month, which includes water, basic tools, and maintenance support.\n\nVolunteer orientation sessions will be held every Saturday in February. Let's grow together as a community!",
+        "Dear Residents,\n\nWe are pleased to inform you that the security camera system upgrade has been successfully completed. The new system provides enhanced coverage and improved image quality for better community safety.\n\nUpgrade highlights:\n• 4K resolution cameras at all entry points\n• Night vision capabilities\n• Motion detection alerts\n• 30-day recording storage\n• Mobile app access for board members\n\nAll cameras are positioned in common areas only, respecting privacy guidelines. The system is monitored 24/7 by our security partner.\n\nYour safety is our priority. Thank you for your patience during the installation process.",
       author: "Lisa Anderson",
       authorAvatar:
         "https://readdy.ai/api/search-image?query=professional%20woman%20with%20curly%20hair%20smiling%20headshot%20portrait%20business%20attire%20clean%20white%20background&width=40&height=40&seq=author5&orientation=squarish",
       date: "Feb 6, 2024",
-      time: "4:10 PM",
-      tag: "Event",
-      priority: "Low",
-      attachments: [
-        {
-          type: "image",
-          name: "garden-layout.jpg",
-          url: "https://readdy.ai/api/search-image?query=community%20garden%20layout%20plan%20with%20individual%20plots%20pathways%20tool%20shed%20and%20composting%20area%20aerial%20view%20design&width=400&height=300&seq=garden1&orientation=landscape",
-        },
-      ],
-      likes: 89,
-      comments: 34,
-      isRead: false,
-    },
-    {
-      id: "6",
-      title: "Security Camera System Upgrade Complete",
-      content:
-        "Dear Residents,\n\nWe are pleased to inform you that the security camera system upgrade has been successfully completed. The new system provides enhanced coverage and improved image quality for better community safety.\n\nUpgrade highlights:\n• 4K resolution cameras at all entry points\n• Night vision capabilities\n• Motion detection alerts\n• 30-day recording storage\n• Mobile app access for board members\n\nAll cameras are positioned in common areas only, respecting privacy guidelines. The system is monitored 24/7 by our security partner.\n\nYour safety is our priority. Thank you for your patience during the installation process.",
-      author: "David Thompson",
-      authorAvatar:
-        "https://readdy.ai/api/search-image?query=professional%20man%20with%20short%20hair%20smiling%20headshot%20portrait%20business%20suit%20clean%20white%20background&width=40&height=40&seq=author6&orientation=squarish",
-      date: "Feb 5, 2024",
-      time: "1:30 PM",
+      time: "11:30 AM",
       tag: "Info",
       priority: "Medium",
       likes: 56,
       comments: 19,
-      isRead: true,
-    },
-    {
-      id: "7",
-      title: "Valentine's Day Community Mixer",
-      content:
-        "Love is in the Air! 💕\n\nJoin us for a delightful Valentine's Day Community Mixer on February 14th from 6:00 PM to 9:00 PM in the Community Center.\n\nEvent highlights:\n• Live acoustic music\n• Wine and cheese reception\n• Couples games and activities\n• Photo booth with props\n• Dessert bar\n\nWhether you're coupled up or flying solo, everyone is welcome! This is a wonderful opportunity to meet your neighbors and strengthen our community bonds.\n\nRSVP by February 12th. Suggested donation: $15 per person to cover refreshments.\n\nLet's celebrate love and friendship together!",
-      author: "Jennifer Martinez",
-      authorAvatar:
-        "https://readdy.ai/api/search-image?query=professional%20hispanic%20woman%20with%20long%20hair%20smiling%20headshot%20portrait%20business%20attire%20clean%20white%20background&width=40&height=40&seq=author7&orientation=squarish",
-      date: "Feb 4, 2024",
-      time: "10:45 AM",
-      tag: "Event",
-      priority: "Low",
-      attachments: [
-        {
-          type: "image",
-          name: "valentines-mixer.jpg",
-          url: "https://readdy.ai/api/search-image?query=elegant%20valentine%20day%20community%20event%20setup%20with%20red%20pink%20decorations%20tables%20chairs%20photo%20booth%20romantic%20lighting&width=400&height=300&seq=valentine1&orientation=landscape",
-        },
-      ],
-      likes: 78,
-      comments: 28,
-      isRead: false,
-    },
-    {
-      id: "8",
-      title: "Parking Enforcement Policy Update",
-      content:
-        "Important Parking Notice\n\nEffective February 15, 2024, we will be implementing stricter parking enforcement to ensure fair access to parking spaces for all residents.\n\nKey changes:\n• Guest parking limited to 48 hours\n• Visitor permits required for extended stays\n• Towing will occur for repeat violations\n• Reserved spots strictly enforced\n• Motorcycle/bicycle designated areas\n\nViolation fees:\n• First offense: Warning\n• Second offense: $25 fine\n• Third offense: $50 fine + towing\n\nPermits are available at the management office. Please ensure all household members and guests are aware of these updated policies.\n\nThank you for your cooperation in maintaining organized parking for everyone.",
-      author: "Mark Rodriguez",
-      authorAvatar:
-        "https://readdy.ai/api/search-image?query=professional%20latino%20man%20with%20mustache%20smiling%20headshot%20portrait%20business%20shirt%20clean%20white%20background&width=40&height=40&seq=author8&orientation=squarish",
-      date: "Feb 3, 2024",
-      time: "3:20 PM",
-      tag: "Alert",
-      priority: "High",
-      likes: 43,
-      comments: 31,
       isRead: true,
     },
   ]);
@@ -226,82 +157,83 @@ export default function MessageBoardScreen() {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64">
-        <div className="bg-white border-b border-gray-200 px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-medium text-black">Message Board</h1>
-              <p className="text-base text-black mt-1 font-medium">
-                Community announcements and updates
-              </p>
-            </div>
-            <button
-              onClick={() => setCreateModalOpen(true)}
-              className="bg-[#1FA372] text-white px-6 py-2.5 rounded-lg hover:bg-[#188f5f] transition-colors flex items-center gap-2 text-base font-medium whitespace-nowrap"
-            >
-              <i className="ri-add-line text-lg"></i>
-              Create Announcement
-            </button>
+      <div className="flex-1 flex flex-col overflow-hidden ml-64">
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-medium text-black">Message Board</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              View and manage community announcements
+            </p>
           </div>
+          <UserProfile />
         </div>
 
         <div className="flex-1 flex overflow-hidden">
-          <div className="w-96 border-r border-gray-200 bg-white overflow-y-auto">
-            <div className="p-6">
-              <div className="relative mb-6">
-                <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-black text-lg"></i>
+          <div className="w-96 border-r border-gray-200 bg-white flex flex-col">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium text-black">All Messages</h2>
+                <span className="text-sm text-gray-500">
+                  {filteredMessages.length} total
+                </span>
+              </div>
+
+              <div className="relative mb-4">
+                <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
                 <input
                   type="text"
                   placeholder="Search messages..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1FA372] text-base text-black font-medium"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1FA372] text-sm text-black"
                 />
               </div>
 
-              <div className="flex gap-2 mb-6">
+              <div className="flex gap-2">
                 <button
                   onClick={() => setFilterTag("All")}
-                  className={`px-4 py-2 rounded-lg text-base font-medium whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                     filterTag === "All"
                       ? "bg-[#1FA372] text-white"
-                      : "bg-gray-100 text-black hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
                   All
                 </button>
                 <button
                   onClick={() => setFilterTag("Event")}
-                  className={`px-4 py-2 rounded-lg text-base font-medium whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                     filterTag === "Event"
                       ? "bg-[#1FA372] text-white"
-                      : "bg-gray-100 text-black hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  Events
+                  Event
                 </button>
                 <button
                   onClick={() => setFilterTag("Alert")}
-                  className={`px-4 py-2 rounded-lg text-base font-medium whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                     filterTag === "Alert"
                       ? "bg-[#1FA372] text-white"
-                      : "bg-gray-100 text-black hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  Alerts
+                  Alert
                 </button>
                 <button
                   onClick={() => setFilterTag("Info")}
-                  className={`px-4 py-2 rounded-lg text-base font-medium whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                     filterTag === "Info"
                       ? "bg-[#1FA372] text-white"
-                      : "bg-gray-100 text-black hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  Information
+                  Info
                 </button>
               </div>
+            </div>
 
+            <div className="flex-1 overflow-y-auto p-4">
               <MessageList
                 messages={filteredMessages}
                 selectedMessageId={selectedMessage?.id}
@@ -316,8 +248,8 @@ export default function MessageBoardScreen() {
             ) : (
               <div className="h-full flex items-center justify-center text-black text-base font-medium">
                 <div className="text-center">
-                  <i className="ri-message-3-line text-6xl text-black mb-4"></i>
-                  <p className="text-lg font-medium text-black">
+                  <i className="ri-message-3-line text-6xl text-gray-300 mb-4"></i>
+                  <p className="text-lg font-medium text-gray-500">
                     Select a message to view details
                   </p>
                 </div>

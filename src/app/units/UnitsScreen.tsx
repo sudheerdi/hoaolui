@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
+import { useSetUnitsBulkUploadMutation } from "@/src/services/hoa-units-bulk-upload";
+import Notification from "@/src/components/base/Notification";
 
 interface Unit {
   id: string;
@@ -18,6 +20,7 @@ interface Document {
 }
 
 export default function UnitsScreen() {
+  const [setUnitsBulkUpload] = useSetUnitsBulkUploadMutation();
   const [searchTerm, setSearchTerm] = useState("");
   const [occupancyFilter, setOccupancyFilter] = useState<"owner" | "tenant">(
     "owner"
@@ -28,6 +31,16 @@ export default function UnitsScreen() {
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(
     null
   );
+  const [showAddUnitPopover, setShowAddUnitPopover] = useState(false);
+  const [activeTab, setActiveTab] = useState<"individual" | "bulk">(
+    "individual"
+  );
+  const [emailId, setEmailId] = useState("");
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const mockUnits: Unit[] = [
     {
@@ -320,13 +333,59 @@ export default function UnitsScreen() {
     setShowDocumentModal(true);
   };
 
+  const handleIndividualUnitSubmit = () => {
+    if (emailId.trim()) {
+      console.log("Adding individual unit with email:", emailId);
+      setEmailId("");
+      setShowAddUnitPopover(false);
+    }
+  };
+
+  const handleBulkUploadSubmit = async () => {
+    if (csvFile) {
+      console.log("Uploading CSV file:", csvFile.name);
+      setCsvFile(null);
+      setShowAddUnitPopover(false);
+    }
+    const formData = new FormData();
+    if (csvFile) {
+      formData.append("file", csvFile);
+    }
+
+    try {
+      const response = await setUnitsBulkUpload(formData);
+      console.log("Bulk upload response:", response);
+    } catch (error: any) {
+      setNotification({
+        type: "error",
+        message: error
+          ? error.data.error
+          : "An unknown error occurred during bulk upload.",
+      });
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCsvFile(e.target.files[0]);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1E293B] overflow-hidden">
       <Sidebar />
 
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
       <div className="lg:ml-[260px] p-[10px] h-screen flex flex-col">
         <div className="bg-white rounded-lg shadow-sm flex flex-col h-full overflow-hidden">
-          <div className="border-b border-gray-200 px-4 py-3 flex-shrink-0">
+          <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-4">
@@ -396,6 +455,124 @@ export default function UnitsScreen() {
 
               <div className="flex items-center space-x-4">
                 <div className="relative">
+                  <button
+                    onClick={() => setShowAddUnitPopover(!showAddUnitPopover)}
+                    className="px-4 py-2 bg-[#1FA372] text-white text-sm font-semibold rounded-lg hover:bg-[#188f5f] transition-colors cursor-pointer whitespace-nowrap flex items-center space-x-2"
+                  >
+                    <i className="ri-add-line text-lg"></i>
+                    <span>Add Unit</span>
+                  </button>
+
+                  {showAddUnitPopover && (
+                    <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-bold text-gray-900">
+                            Add Unit
+                          </h3>
+                          <button
+                            onClick={() => setShowAddUnitPopover(false)}
+                            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                          >
+                            <i className="ri-close-line text-xl"></i>
+                          </button>
+                        </div>
+
+                        <div className="flex space-x-1 mb-4 bg-gray-100 rounded-full p-1">
+                          <button
+                            onClick={() => setActiveTab("individual")}
+                            className={`flex-1 px-1 py-1 rounded-full text-sm font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                              activeTab === "individual"
+                                ? "bg-white text-[#1FA372] shadow-sm"
+                                : "text-gray-600 hover:text-gray-900"
+                            }`}
+                          >
+                            Individual Unit
+                          </button>
+                          <button
+                            onClick={() => setActiveTab("bulk")}
+                            className={`flex-1 px-1 py-1 rounded-full text-sm font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                              activeTab === "bulk"
+                                ? "bg-white text-[#1FA372] shadow-sm"
+                                : "text-gray-600 hover:text-gray-900"
+                            }`}
+                          >
+                            Bulk Units Upload
+                          </button>
+                        </div>
+
+                        {activeTab === "individual" ? (
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Email ID
+                              </label>
+                              <input
+                                type="email"
+                                value={emailId}
+                                onChange={(e) => setEmailId(e.target.value)}
+                                placeholder="Enter email address"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                              />
+                            </div>
+                            <button
+                              onClick={handleIndividualUnitSubmit}
+                              disabled={!emailId.trim()}
+                              className={`w-full py-2 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                                emailId.trim()
+                                  ? "bg-[#1FA372] text-white hover:bg-[#188f5f]"
+                                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              }`}
+                            >
+                              Active
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Upload CSV File
+                              </label>
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#1FA372] transition-colors">
+                                <input
+                                  type="file"
+                                  accept=".csv"
+                                  onChange={handleFileChange}
+                                  className="hidden"
+                                  id="csv-upload"
+                                />
+                                <label
+                                  htmlFor="csv-upload"
+                                  className="cursor-pointer flex flex-col items-center"
+                                >
+                                  <i className="ri-upload-cloud-2-line text-4xl text-gray-400 mb-2"></i>
+                                  <span className="text-sm text-gray-600">
+                                    {csvFile
+                                      ? csvFile.name
+                                      : "Click to upload CSV file"}
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                            <button
+                              onClick={handleBulkUploadSubmit}
+                              disabled={!csvFile}
+                              className={`w-full py-2 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                                csvFile
+                                  ? "bg-[#1FA372] text-white hover:bg-[#188f5f]"
+                                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              }`}
+                            >
+                              Active
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative">
                   <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
                     <i className="ri-notification-3-line text-lg"></i>
                   </button>
@@ -424,7 +601,7 @@ export default function UnitsScreen() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F9FAFB]">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
               {filteredUnits.map((unit) => (
                 <div

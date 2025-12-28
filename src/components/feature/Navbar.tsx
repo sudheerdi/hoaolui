@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Button from "../base/Button";
-import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const router = useRouter();
-  const currentPath = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const currentPath = usePathname();
+  const router = useRouter();
 
   const navItems = [
     { name: "Features", href: "/features" },
@@ -23,7 +23,7 @@ export default function Navbar() {
       title: "Self HOA Board",
       description: "Manage your community board",
       icon: "ri-community-line",
-      href: "/signup/hoa-board",
+      href: "/signup",
     },
     {
       title: "Property Manager",

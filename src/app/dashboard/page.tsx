@@ -14,9 +14,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useState } from "react";
-import { useUserAuthToken } from "../../helpers/hooks/useUserAuthToken";
+import { useState, useEffect, use } from "react";
 import { useAppSelector } from "@/src/lib/hooks";
+import { useGetViolationDefaultsMutation } from "../../services/hoa-violation-defaults";
 
 const revenueData = [
   { month: "Jan", revenue: 45000 },
@@ -49,8 +49,8 @@ interface ViolationType {
 }
 
 export default function Dashboard() {
-  const isAuthenticated = useUserAuthToken();
   const { user } = useAppSelector((state) => state.hoaUser);
+  const [getViolationDefaults] = useGetViolationDefaultsMutation();
   const [showSendViolationModal, setShowSendViolationModal] = useState(false);
   const [showMakePaymentModal, setShowMakePaymentModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
@@ -256,7 +256,17 @@ export default function Dashboard() {
     }
   };
 
-  if (!isAuthenticated) return null;
+  const handleGetViolationDefaults = async () => {
+    try {
+      await getViolationDefaults(null);
+    } catch (error) {
+      console.error("Error fetching violation defaults:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetViolationDefaults();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#1E293B] overflow-hidden">
@@ -315,7 +325,7 @@ export default function Dashboard() {
 
       <div className="ml-0 lg:ml-[260px] lg:mr-[300px] p-[10px] h-screen flex flex-col">
         <div className="bg-white rounded-lg shadow-sm flex flex-col h-full overflow-hidden">
-          <div className="px-4 py-2 flex-shrink-0">
+          <div className="bg-white px-4 py-2 flex-shrink-0 border-b border-gray-200">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               <div className="flex items-center gap-3 w-full lg:w-auto">
                 <button
@@ -326,7 +336,7 @@ export default function Dashboard() {
                 </button>
                 <div>
                   <div className="text-xl font-bold text-black">
-                    Welcome {user.firstName} {user.lastName}
+                    Welcome {user?.firstName} {user?.lastName}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
                     Manage your community with ease
@@ -362,7 +372,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F9FAFB]">
             <div className="mb-4 block lg:hidden">
               <PaymentStatusChart />
             </div>
@@ -475,16 +485,18 @@ export default function Dashboard() {
       </div>
 
       <div className="hidden lg:block fixed right-0 top-[10px] bottom-[10px] w-[280px] mr-[10px]">
-        <div className="bg-white rounded-lg shadow-sm h-full overflow-y-auto border border-gray-100">
-          <div className="p-4">
-            <h3 className="text-lg font-bold text-black mb-4 text-center">
+        <div className="bg-white rounded-lg shadow-sm h-full overflow-hidden border border-gray-100 flex flex-col">
+          <div className="bg-white p-4 border-b border-gray-200">
+            <h3 className="text-lg font-bold text-black text-center">
               Upcoming Events
             </h3>
+          </div>
+          <div className="flex-1 overflow-y-auto bg-[#F9FAFB] p-4">
             <div className="space-y-3">
               {upcomingEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="bg-gray-50 rounded-lg p-3 border border-gray-100"
+                  className="bg-white rounded-lg p-3 border border-gray-100 shadow-sm"
                 >
                   <h4 className="text-sm font-medium text-gray-900 mb-1 leading-tight">
                     {event.title}

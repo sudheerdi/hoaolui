@@ -12,7 +12,7 @@ export const hoaUserRegisterApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    setHoaUserRegister: builder.query<userResponseType, userRequestType>({
+    setHoaUserRegister: builder.mutation<userResponseType, userRequestType>({
       query: ({ ...postBody }) => ({
         url: "register",
         method: "POST",
@@ -22,4 +22,4 @@ export const hoaUserRegisterApi = createApi({
   }),
 });
 
-export const { useLazySetHoaUserRegisterQuery } = hoaUserRegisterApi;
+export const { useSetHoaUserRegisterMutation } = hoaUserRegisterApi;

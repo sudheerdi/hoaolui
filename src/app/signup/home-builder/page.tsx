@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import Navbar from "../../../components/feature/Navbar";
+import Footer from "../../../components/feature/Footer";
 import Button from "../../../components/base/Button";
-import { useRouter } from "next/navigation";
+import Notification from "../../../components/base/Notification";
 
 export default function HomeBuilderSignup() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     communityName: "",
     email: "",
@@ -16,6 +16,8 @@ export default function HomeBuilderSignup() {
     hearAboutUs: "",
     captchaVerified: false,
   });
+
+  const [notification, setNotification] = useState(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -30,7 +32,7 @@ export default function HomeBuilderSignup() {
     e.preventDefault();
     if (formData.captchaVerified) {
       console.log("Form submitted:", formData);
-      router.push("/dashboard/home-builder");
+      window.REACT_APP_NAVIGATE("/dashboard/home-builder");
     }
   };
 
@@ -38,7 +40,15 @@ export default function HomeBuilderSignup() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-grow bg-gradient-to-br from-gray-100 to-gray-50 py-16">
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
+      <main className="flex-grow bg-gradient-to-br from-gray-100 to-gray-50 py-6">
         <div className="max-w-xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl p-10">
             <div className="text-center mb-8">
@@ -290,6 +300,8 @@ export default function HomeBuilderSignup() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

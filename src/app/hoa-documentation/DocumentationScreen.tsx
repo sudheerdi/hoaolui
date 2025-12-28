@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import React from "react";
-import Sidebar from "@/src/components/Sidebar";
+import Sidebar from "../../components/Sidebar";
 
 // Interface definitions
 interface Document {
@@ -620,7 +620,7 @@ export default function DocumentationScreen() {
           </div>
         </div>
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden bg-[#F9FAFB]">
           {/* Folder Structure - 70% */}
           <div className="w-[70%] border-r border-gray-200 bg-white flex flex-col overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex-shrink-0">

@@ -1,9 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState } from "react";
+import Link from "next/link";
+import { useAppSelector } from "../lib/hooks";
 
 export default function UserProfile() {
+  const { user } = useAppSelector((state) => state.hoaUser);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -13,10 +15,17 @@ export default function UserProfile() {
         className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
       >
         <div className="w-10 h-10 bg-[#1FA372] rounded-full flex items-center justify-center">
-          <span className="text-white text-sm font-semibold">JD</span>
+          <span className="text-white text-sm font-semibold">
+            {user?.firstName?.charAt(0)}
+            {user?.lastName?.charAt(0)}
+          </span>
         </div>
         <div className="w-5 h-5 flex items-center justify-center">
-          <i className={`ri-arrow-${isOpen ? 'up' : 'down'}-s-line text-gray-600`}></i>
+          <i
+            className={`ri-arrow-${
+              isOpen ? "up" : "down"
+            }-s-line text-gray-600`}
+          ></i>
         </div>
       </button>
 
@@ -26,11 +35,13 @@ export default function UserProfile() {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           ></div>
-          
+
           <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
             <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-semibold text-gray-900">John Doe</p>
-              <p className="text-xs text-gray-500">john.doe@example.com</p>
+              <p className="text-sm font-semibold text-gray-900">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="text-xs text-gray-500">{user?.emailId}</p>
             </div>
 
             <div className="py-2">

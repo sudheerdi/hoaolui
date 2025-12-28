@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Navbar from "../../../components/feature/Navbar";
+import Footer from "../../../components/feature/Footer";
 import Button from "../../../components/base/Button";
+import Notification from "../../../components/base/Notification";
 import { serviceCategories } from "../../../lib/mocks/services";
-import { useRouter } from "next/navigation";
 
 interface ServiceSelection {
   category: string;
@@ -13,7 +14,6 @@ interface ServiceSelection {
 }
 
 export default function ServiceProviderSignup() {
-  const router = useRouter();
   const [serviceSelections, setServiceSelections] = useState<
     ServiceSelection[]
   >([]);
@@ -23,6 +23,11 @@ export default function ServiceProviderSignup() {
   const [categoryHoverPosition, setCategoryHoverPosition] = useState<number>(0);
   const [subcategoryHoverPosition, setSubcategoryHoverPosition] =
     useState<number>(0);
+
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const [businessInfo, setBusinessInfo] = useState({
     companyLogo: "",
@@ -37,6 +42,10 @@ export default function ServiceProviderSignup() {
     title: "",
     directPhone: "",
     directEmail: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
     serviceCoverageArea: "",
     verifiedVendor: false,
     preferredVendor: false,
@@ -104,11 +113,11 @@ export default function ServiceProviderSignup() {
       personalDetails,
       reviewRatings,
     });
-    router.push("/dashboard/service-provider");
+    window.REACT_APP_NAVIGATE("/dashboard/service-provider");
   };
 
   const handleCancel = () => {
-    router.push("/");
+    window.REACT_APP_NAVIGATE("/");
   };
 
   const hoveredCategoryData = serviceCategories.find(
@@ -122,7 +131,15 @@ export default function ServiceProviderSignup() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-grow bg-gradient-to-br from-gray-100 to-gray-50 py-16">
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
+      <main className="flex-grow bg-gradient-to-br from-gray-100 to-gray-50 py-6">
         <div className="h-full px-8">
           <div className="bg-white rounded-2xl shadow-xl p-6 h-full flex flex-col">
             <div className="text-center mb-6">
@@ -633,6 +650,116 @@ export default function ServiceProviderSignup() {
                       </div>
                       <div className="col-span-2">
                         <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Address
+                        </label>
+                        <input
+                          type="text"
+                          value={personalDetails.address}
+                          onChange={(e) =>
+                            handlePersonalDetailsChange(
+                              "address",
+                              e.target.value
+                            )
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none transition-all text-xs"
+                          style={{
+                            transition: "all 0.2s",
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = "#1FA372";
+                            e.currentTarget.style.boxShadow =
+                              "0 0 0 2px rgba(31, 163, 114, 0.2)";
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = "#d1d5db";
+                            e.currentTarget.style.boxShadow = "none";
+                          }}
+                          placeholder="Street address"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          value={personalDetails.city}
+                          onChange={(e) =>
+                            handlePersonalDetailsChange("city", e.target.value)
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none transition-all text-xs"
+                          style={{
+                            transition: "all 0.2s",
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = "#1FA372";
+                            e.currentTarget.style.boxShadow =
+                              "0 0 0 2px rgba(31, 163, 114, 0.2)";
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = "#d1d5db";
+                            e.currentTarget.style.boxShadow = "none";
+                          }}
+                          placeholder="City"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          State
+                        </label>
+                        <input
+                          type="text"
+                          value={personalDetails.state}
+                          onChange={(e) =>
+                            handlePersonalDetailsChange("state", e.target.value)
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none transition-all text-xs"
+                          style={{
+                            transition: "all 0.2s",
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = "#1FA372";
+                            e.currentTarget.style.boxShadow =
+                              "0 0 0 2px rgba(31, 163, 114, 0.2)";
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = "#d1d5db";
+                            e.currentTarget.style.boxShadow = "none";
+                          }}
+                          placeholder="State"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          ZIP Code
+                        </label>
+                        <input
+                          type="text"
+                          value={personalDetails.zipCode}
+                          onChange={(e) =>
+                            handlePersonalDetailsChange(
+                              "zipCode",
+                              e.target.value
+                            )
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none transition-all text-xs"
+                          style={{
+                            transition: "all 0.2s",
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = "#1FA372";
+                            e.currentTarget.style.boxShadow =
+                              "0 0 0 2px rgba(31, 163, 114, 0.2)";
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = "#d1d5db";
+                            e.currentTarget.style.boxShadow = "none";
+                          }}
+                          placeholder="ZIP Code"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           Service Coverage Area
                         </label>
                         <input
@@ -890,6 +1017,8 @@ export default function ServiceProviderSignup() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

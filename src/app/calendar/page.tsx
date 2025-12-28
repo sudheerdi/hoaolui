@@ -1,4 +1,4 @@
-import Sidebar from "@/src/components/Sidebar";
+import Sidebar from "../../components/Sidebar";
 import CalendarScreen from "./CalendarScreen";
 
 export default function CalendarPage() {

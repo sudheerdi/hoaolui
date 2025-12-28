@@ -13,86 +13,60 @@ export default function MessageList({
   selectedMessageId,
   onSelectMessage,
 }: MessageListProps) {
-  const getTagColor = (tag: string) => {
+  const getTagIcon = (tag: string) => {
     switch (tag) {
       case 'Event':
-        return 'bg-teal-100 text-teal-800';
+        return 'ri-calendar-event-line';
       case 'Alert':
-        return 'bg-red-100 text-red-800';
+        return 'ri-alarm-warning-line';
       case 'Info':
-        return 'bg-blue-100 text-blue-800';
+        return 'ri-information-line';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'ri-message-3-line';
     }
   };
 
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case 'High':
-        return 'ri-alarm-warning-line text-red-500';
-      case 'Medium':
-        return 'ri-information-line text-amber-500';
-      case 'Low':
-        return 'ri-checkbox-circle-line text-green-500';
+  const getTagColor = (tag: string) => {
+    switch (tag) {
+      case 'Event':
+        return 'bg-blue-100 text-blue-700';
+      case 'Alert':
+        return 'bg-red-100 text-red-700';
+      case 'Info':
+        return 'bg-gray-100 text-gray-700';
       default:
-        return 'ri-information-line text-gray-500';
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {messages.map((message) => (
         <div
           key={message.id}
           onClick={() => onSelectMessage(message)}
-          className={`p-4 border border-gray-200 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+          className={`p-3 border rounded-lg cursor-pointer transition-all hover:bg-gray-50 ${
             selectedMessageId === message.id
               ? 'bg-green-50 border-[#1FA372]'
-              : 'bg-white'
+              : 'bg-white border-gray-200'
           }`}
         >
           <div className="flex items-start gap-3">
-            <img
-              src={message.authorAvatar}
-              alt={message.author}
-              className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-            />
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getTagColor(message.tag)}`}>
+              <i className={`${getTagIcon(message.tag)} text-lg`}></i>
+            </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getTagColor(message.tag)}`}>
-                  {message.tag}
-                </span>
-                <i className={`${getPriorityIcon(message.priority)} text-sm`}></i>
-                {!message.isRead && <div className="w-2 h-2 bg-blue-600 rounded-full"></div>}
-              </div>
-
-              <h3
-                className={`text-base font-medium mb-1 line-clamp-2 ${
-                  !message.isRead ? 'text-black' : 'text-black'
-                }`}
-              >
+              <h3 className="text-sm font-medium text-black mb-1 line-clamp-1">
                 {message.title}
               </h3>
 
-              <p className="text-sm text-black font-medium line-clamp-2 mb-2">
-                {message.content}
-              </p>
-
-              <div className="flex items-center justify-between text-sm text-black font-medium">
+              <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
                 <span>{message.author}</span>
+                <span>•</span>
                 <span>{message.date}</span>
-              </div>
-
-              <div className="flex items-center gap-4 mt-2 text-sm text-black font-medium">
-                <span className="flex items-center gap-1">
-                  <i className="ri-thumb-up-line"></i>
-                  {message.likes}
-                </span>
-                <span className="flex items-center gap-1">
-                  <i className="ri-chat-3-line"></i>
-                  {message.comments}
-                </span>
+                <span>•</span>
+                <span>{message.time}</span>
               </div>
             </div>
           </div>
@@ -102,10 +76,10 @@ export default function MessageList({
       {messages.length === 0 && (
         <div className="text-center py-12">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i className="ri-message-3-line text-black text-3xl"></i>
+            <i className="ri-message-3-line text-gray-400 text-3xl"></i>
           </div>
-          <h3 className="text-base font-medium text-black mb-2">No messages found</h3>
-          <p className="text-sm text-black font-medium">Try adjusting your filters or search query</p>
+          <h3 className="text-base font-medium text-gray-700 mb-2">No messages found</h3>
+          <p className="text-sm text-gray-500">Try adjusting your filters or search query</p>
         </div>
       )}
     </div>

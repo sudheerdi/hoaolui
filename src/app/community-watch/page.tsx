@@ -1,5 +1,6 @@
-import CommunityWatchScreen from "./CommunityWatchScreen";
-import Sidebar from "../../components/Sidebar";
+
+import CommunityWatchScreen from './CommunityWatchScreen';
+import Sidebar from '../../components/Sidebar';
 
 export default function CommunityWatchPage() {
   return (

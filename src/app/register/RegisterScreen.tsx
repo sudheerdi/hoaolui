@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterScreen() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,26 +21,24 @@ export default function RegisterScreen() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      alert('Passwords do not match!');
       return;
     }
-    router.push("/create-community");
+    router.push('/create-community');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-green-50 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            CommUnity Connect
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">CommUnity Connect</h1>
           <p className="text-gray-600">Create your account to get started</p>
         </div>
 
@@ -139,7 +137,7 @@ export default function RegisterScreen() {
                   <i className="ri-lock-line text-gray-400"></i>
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -152,11 +150,7 @@ export default function RegisterScreen() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer w-5 h-5"
                 >
-                  <i
-                    className={`${
-                      showPassword ? "ri-eye-off-line" : "ri-eye-line"
-                    } text-gray-400 hover:text-gray-600`}
-                  ></i>
+                  <i className={`${showPassword ? 'ri-eye-off-line' : 'ri-eye-line'} text-gray-400 hover:text-gray-600`}></i>
                 </button>
               </div>
             </div>
@@ -170,7 +164,7 @@ export default function RegisterScreen() {
                   <i className="ri-lock-line text-gray-400"></i>
                 </div>
                 <input
-                  type={showConfirmPassword ? "text" : "password"}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -183,11 +177,7 @@ export default function RegisterScreen() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer w-5 h-5"
                 >
-                  <i
-                    className={`${
-                      showConfirmPassword ? "ri-eye-off-line" : "ri-eye-line"
-                    } text-gray-400 hover:text-gray-600`}
-                  ></i>
+                  <i className={`${showConfirmPassword ? 'ri-eye-off-line' : 'ri-eye-line'} text-gray-400 hover:text-gray-600`}></i>
                 </button>
               </div>
             </div>
@@ -201,18 +191,12 @@ export default function RegisterScreen() {
                 required
               />
               <label className="ml-2 text-sm text-gray-700 cursor-pointer">
-                I agree to the{" "}
-                <Link
-                  href="/terms"
-                  className="text-teal-600 hover:text-teal-700 font-medium"
-                >
+                I agree to the{' '}
+                <Link href="/terms" className="text-teal-600 hover:text-teal-700 font-medium">
                   Terms and Conditions
-                </Link>{" "}
-                and{" "}
-                <Link
-                  href="/privacy"
-                  className="text-teal-600 hover:text-teal-700 font-medium"
-                >
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy" className="text-teal-600 hover:text-teal-700 font-medium">
                   Privacy Policy
                 </Link>
               </label>
@@ -228,11 +212,8 @@ export default function RegisterScreen() {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="text-teal-600 hover:text-teal-700 font-semibold cursor-pointer"
-              >
+              Already have an account?{' '}
+              <Link href="/login" className="text-teal-600 hover:text-teal-700 font-semibold cursor-pointer">
                 Login
               </Link>
             </p>

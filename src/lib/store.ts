@@ -1,6 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import reducer from "../reducer";
-import { hoaUserRegisterApi, hoaUserLoginApi } from "../services";
+import {
+  hoaUserRegisterApi,
+  hoaUserLoginApi,
+  hoaUnitsBulkUploadApi,
+  hoaViolationDefaultsApi,
+} from "../services";
 
 export const makeStore = () => {
   return configureStore({
@@ -8,7 +13,12 @@ export const makeStore = () => {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,
-      }).concat(hoaUserRegisterApi.middleware, hoaUserLoginApi.middleware),
+      }).concat(
+        hoaUserRegisterApi.middleware,
+        hoaUserLoginApi.middleware,
+        hoaUnitsBulkUploadApi.middleware,
+        hoaViolationDefaultsApi.middleware
+      ),
   });
 };
 
