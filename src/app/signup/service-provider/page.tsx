@@ -6,6 +6,7 @@ import Footer from "../../../components/feature/Footer";
 import Button from "../../../components/base/Button";
 import Notification from "../../../components/base/Notification";
 import { serviceCategories } from "../../../lib/mocks/services";
+import { useRouter } from "next/navigation";
 
 interface ServiceSelection {
   category: string;
@@ -14,6 +15,7 @@ interface ServiceSelection {
 }
 
 export default function ServiceProviderSignup() {
+  const router = useRouter();
   const [serviceSelections, setServiceSelections] = useState<
     ServiceSelection[]
   >([]);
@@ -113,11 +115,11 @@ export default function ServiceProviderSignup() {
       personalDetails,
       reviewRatings,
     });
-    window.REACT_APP_NAVIGATE("/dashboard/service-provider");
+    router.push("/dashboard/service-provider");
   };
 
   const handleCancel = () => {
-    window.REACT_APP_NAVIGATE("/");
+    router.push("/dashboard");
   };
 
   const hoveredCategoryData = serviceCategories.find(
