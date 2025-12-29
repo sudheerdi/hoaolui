@@ -3,8 +3,8 @@ import { RootState } from "../lib/store";
 
 const base = "http://localhost:8080/api";
 
-export const hoaViolationDefaultsApi = createApi({
-  reducerPath: "hoaViolationDefaults",
+export const hoaViolationsApi = createApi({
+  reducerPath: "hoaViolations",
   baseQuery: fetchBaseQuery({
     baseUrl: `${base}/community/`,
     prepareHeaders: (headers, { getState }) => {
@@ -15,13 +15,24 @@ export const hoaViolationDefaultsApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getViolationDefaults: builder.mutation<any, any>({
+    getViolationDefaults: builder.query<ViolationDefaultsType, any>({
       query: () => ({
         url: "violation-defaults",
         method: "GET",
       }),
     }),
+    createViolation: builder.mutation<
+      ViolationResponseType,
+      ViolationRequestType
+    >({
+      query: (payload) => ({
+        url: "violations",
+        method: "POST",
+        body: payload,
+      }),
+    }),
   }),
 });
 
-export const { useGetViolationDefaultsMutation } = hoaViolationDefaultsApi;
+export const { useLazyGetViolationDefaultsQuery, useCreateViolationMutation } =
+  hoaViolationsApi;

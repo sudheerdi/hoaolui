@@ -3,7 +3,8 @@ import {
   hoaUserRegisterApi,
   hoaUserLoginApi,
   hoaUnitsBulkUploadApi,
-  hoaViolationDefaultsApi,
+  hoaViolationsApi,
+  hoaUserSearchApi,
 } from "../services";
 
 const reducer = {
@@ -11,7 +12,8 @@ const reducer = {
   [hoaUserRegisterApi.reducerPath]: hoaUserRegisterApi.reducer,
   [hoaUserLoginApi.reducerPath]: hoaUserLoginApi.reducer,
   [hoaUnitsBulkUploadApi.reducerPath]: hoaUnitsBulkUploadApi.reducer,
-  [hoaViolationDefaultsApi.reducerPath]: hoaViolationDefaultsApi.reducer,
+  [hoaViolationsApi.reducerPath]: hoaViolationsApi.reducer,
+  [hoaUserSearchApi.reducerPath]: hoaUserSearchApi.reducer,
 };
 
 export default reducer;

@@ -1,0 +1,47 @@
+type ViolationType = {
+  id: string;
+  violationType: string;
+  compliancePeriod: number;
+  responsePeriod: number;
+  templateDescription: string;
+  typeSpecificConfig: string;
+};
+
+type ViolationDefaultsType = {
+  violationDefaults: Array<ViolationType>;
+};
+
+type ViolationRequestType = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  emailId: string;
+  mobileNumber: string;
+  unitId: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  membershipId: string;
+  type: string;
+  violationDate: string;
+  description: string;
+  violationPicture: string;
+  dynamicValues: {
+    vehicleDescription: string;
+    licensePlate: string;
+  };
+};
+
+type ViolationResponseType = {
+  type: string;
+  violationId: string;
+  responseDueDate: string;
+  status: string;
+  amountToBePaid: number;
+  message: string;
+  complianceDueDate: string;
+  generatedNotice: string;
+};
