@@ -19,7 +19,7 @@ export const hoaUnitsBulkUploadApi = createApi({
       query: (formData) => ({
         url: "bulk-upload",
         method: "POST",
-        body: { ...formData },
+        body: formData,
         formData: true,
       }),
     }),

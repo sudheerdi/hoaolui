@@ -5,6 +5,7 @@ import {
   useLazyGetViolationDefaultsQuery,
   useLazyGetUsersQuery,
 } from "@/src/services";
+import { violationIcons } from "@/src/helpers";
 
 interface SendViolationModalProps {
   isOpen: boolean;
@@ -168,7 +169,10 @@ export default function SendViolationModal({
   isOpen,
   onClose,
 }: SendViolationModalProps) {
-  const [getViolationDefaults] = useLazyGetViolationDefaultsQuery();
+  const [
+    getViolationDefaults,
+    { data: defaultViolationsData, isLoading: isLoadingViolationsDefaults },
+  ] = useLazyGetViolationDefaultsQuery();
   const [getUsers, { data: usersData }] = useLazyGetUsersQuery();
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedViolationType, setSelectedViolationType] = useState("");
@@ -190,9 +194,11 @@ export default function SendViolationModal({
 
   const handleViolationTypeChange = (typeId: string) => {
     setSelectedViolationType(typeId);
-    const selectedType = violationTypes.find((type) => type.id === typeId);
+    const selectedType = defaultViolationsData?.violationDefaults.find(
+      (type) => type.id === typeId
+    );
     if (selectedType) {
-      setViolationContent(selectedType.defaultContent);
+      setViolationContent(selectedType.templateDescription);
     } else {
       setViolationContent("");
     }
@@ -320,22 +326,25 @@ export default function SendViolationModal({
               Violation Type <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-3 gap-3">
-              {violationTypes.map((type) => (
-                <button
-                  key={type.id}
-                  onClick={() => handleViolationTypeChange(type.id)}
-                  className={`p-3 rounded-lg border-2 transition-all text-center hover:border-[#1FA372] cursor-pointer ${
-                    selectedViolationType === type.id
-                      ? "border-[#1FA372] bg-[#1FA372]/10 text-[#1FA372]"
-                      : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{type.icon}</div>
-                  <div className="text-xs font-medium leading-tight">
-                    {type.name}
-                  </div>
-                </button>
-              ))}
+              {defaultViolationsData &&
+                defaultViolationsData.violationDefaults.map((violation) => (
+                  <button
+                    key={violation.id}
+                    onClick={() => handleViolationTypeChange(violation.id)}
+                    className={`p-3 rounded-lg border-2 transition-all text-center hover:border-[#1FA372] cursor-pointer ${
+                      selectedViolationType === violation.id
+                        ? "border-[#1FA372] bg-[#1FA372]/10 text-[#1FA372]"
+                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">
+                      {violationIcons[violation.violationType.toLowerCase()]}
+                    </div>
+                    <div className="text-xs font-medium leading-tight break-words">
+                      {violation.violationType}
+                    </div>
+                  </button>
+                ))}
             </div>
           </div>
 

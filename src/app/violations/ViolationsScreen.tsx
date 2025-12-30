@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import ViolationDetails from "./ViolationDetails";
 import { useLazyGetUsersQuery } from "../../services";
+import SendViolationModal from "../../components/modals/SendViolationModal";
 
 interface Violation {
   id: string;
@@ -762,158 +763,10 @@ export default function ViolationsScreen() {
       </div>
 
       {/* Send Violation Modal */}
-      {showSendViolationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Send Violation Notice
-              </h3>
-              <button
-                onClick={() => {
-                  setShowSendViolationModal(false);
-                  setSelectedUser("");
-                  setSelectedViolationType("");
-                  setViolationContent("");
-                  setUserSearchTerm("");
-                  setShowUserDropdown(false);
-                }}
-                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <i className="ri-close-line text-lg"></i>
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              {/* Search Resident */}
-              <div>
-                <label className="block text-base font-medium text-black mb-2">
-                  Search Resident <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="ri-search-line text-gray-400"></i>
-                  </div>
-                  <input
-                    type="text"
-                    value={userSearchTerm}
-                    onChange={(e) => {
-                      setUserSearchTerm(e.target.value);
-                      setShowUserDropdown(true);
-                      if (!e.target.value) {
-                        setSelectedUser("");
-                      }
-                    }}
-                    onFocus={() => setShowUserDropdown(true)}
-                    placeholder="Search by address..."
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  />
-
-                  {/* Search Dropdown */}
-                  {showUserDropdown &&
-                    userSearchTerm &&
-                    filteredUsers.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        {filteredUsers.map((user) => (
-                          <button
-                            key={user.id}
-                            onClick={() => handleUserSelect(user)}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                          >
-                            <div className="font-medium text-gray-900">
-                              {user.name}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {user.unit} • {user.email}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                </div>
-              </div>
-
-              {/* Violation Type Selection */}
-              <div>
-                <label className="block text-base font-medium text-black mb-3">
-                  Violation Type <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {violationTypes.map((type) => (
-                    <button
-                      key={type.id}
-                      onClick={() => handleViolationTypeChange(type.id)}
-                      className={`p-3 rounded-lg border-2 transition-all text-center hover:border-teal-300 ${
-                        selectedViolationType === type.id
-                          ? "border-teal-500 bg-teal-50 text-teal-700"
-                          : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="text-2xl mb-1">{type.icon}</div>
-                      <div className="text-xs font-medium leading-tight">
-                        {type.name}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Violation Content */}
-              <div>
-                <label className="block text-base font-medium text-black mb-2">
-                  Violation Notice Content{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={violationContent}
-                  onChange={(e) => setViolationContent(e.target.value)}
-                  placeholder="Select a violation type to see default content, or write your own message..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  rows={8}
-                  maxLength={500}
-                />
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-xs text-gray-500">
-                    You can edit the default content or write your own message
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {violationContent.length}/500 characters
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-3 mt-8">
-              <button
-                onClick={() => {
-                  setShowSendViolationModal(false);
-                  setSelectedUser("");
-                  setSelectedViolationType("");
-                  setViolationContent("");
-                  setUserSearchTerm("");
-                  setShowUserDropdown(false);
-                }}
-                className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSendViolation}
-                disabled={
-                  !selectedUser ||
-                  !selectedViolationType ||
-                  !violationContent.trim()
-                }
-                className="flex-1 bg-[#1FA372] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#188f5f] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
-              >
-                <i className="ri-send-plane-line mr-2"></i>
-                Send Violation Notice
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SendViolationModal
+        isOpen={showSendViolationModal}
+        onClose={() => setShowSendViolationModal(false)}
+      />
     </div>
   );
 }
