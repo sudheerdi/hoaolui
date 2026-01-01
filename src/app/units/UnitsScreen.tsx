@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
-import { useSetUnitsBulkUploadMutation } from "@/src/services/hoa-units-bulk-upload";
-import Notification from "@/src/components/base/Notification";
+import { useSetUnitsBulkUploadMutation } from "@/src/services";
+import Notification from "../../components/base/Notification";
 
 interface Unit {
   id: string;
@@ -21,6 +21,10 @@ interface Document {
 
 export default function UnitsScreen() {
   const [setUnitsBulkUpload] = useSetUnitsBulkUploadMutation();
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [occupancyFilter, setOccupancyFilter] = useState<"owner" | "tenant">(
     "owner"
@@ -32,15 +36,99 @@ export default function UnitsScreen() {
     null
   );
   const [showAddUnitPopover, setShowAddUnitPopover] = useState(false);
-  const [activeTab, setActiveTab] = useState<"individual" | "bulk">(
-    "individual"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "individual" | "bulk" | "changeOwner"
+  >("individual");
   const [emailId, setEmailId] = useState("");
   const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [notification, setNotification] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
+  const [ownerSearchTerm, setOwnerSearchTerm] = useState("");
+  const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
+
+  const [changeOwnerData, setChangeOwnerData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    mobile: "",
+    address1: "",
+    address2: "",
+    state: "",
+    city: "",
+    country: "",
+    zipcode: "",
+  });
+
+  const mockOwners = [
+    {
+      id: "1",
+      name: "John Smith",
+      firstName: "John",
+      lastName: "Smith",
+      email: "john.smith@email.com",
+      mobile: "+1 (555) 123-4567",
+      address1: "55 forest way",
+      address2: "",
+      city: "Greensboro",
+      state: "NC",
+      country: "USA",
+      zipcode: "27409",
+    },
+    {
+      id: "2",
+      name: "Maria Garcia",
+      firstName: "Maria",
+      lastName: "Garcia",
+      email: "maria.garcia@email.com",
+      mobile: "+1 (555) 234-5678",
+      address1: "42 maple street",
+      address2: "Apt 5B",
+      city: "Greensboro",
+      state: "NC",
+      country: "USA",
+      zipcode: "27408",
+    },
+    {
+      id: "3",
+      name: "Robert Johnson",
+      firstName: "Robert",
+      lastName: "Johnson",
+      email: "robert.j@email.com",
+      mobile: "+1 (555) 345-6789",
+      address1: "78 oak avenue",
+      address2: "",
+      city: "Greensboro",
+      state: "NC",
+      country: "USA",
+      zipcode: "27410",
+    },
+    {
+      id: "4",
+      name: "Lisa Chen",
+      firstName: "Lisa",
+      lastName: "Chen",
+      email: "lisa.chen@email.com",
+      mobile: "+1 (555) 456-7890",
+      address1: "91 pine road",
+      address2: "Suite 12",
+      city: "Greensboro",
+      state: "NC",
+      country: "USA",
+      zipcode: "27407",
+    },
+    {
+      id: "5",
+      name: "David Wilson",
+      firstName: "David",
+      lastName: "Wilson",
+      email: "david.w@email.com",
+      mobile: "+1 (555) 567-8901",
+      address1: "23 elm drive",
+      address2: "",
+      city: "Greensboro",
+      state: "NC",
+      country: "USA",
+      zipcode: "27411",
+    },
+  ];
 
   const mockUnits: Unit[] = [
     {
@@ -300,6 +388,10 @@ export default function UnitsScreen() {
     return matchesSearch && matchesType;
   });
 
+  const filteredOwners = mockOwners.filter((owner) =>
+    owner.name.toLowerCase().includes(ownerSearchTerm.toLowerCase())
+  );
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -365,10 +457,64 @@ export default function UnitsScreen() {
     }
   };
 
+  const handleChangeOwnerSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !changeOwnerData.firstName ||
+      !changeOwnerData.lastName ||
+      !changeOwnerData.email ||
+      !changeOwnerData.mobile
+    ) {
+      return;
+    }
+    setShowAddUnitPopover(false);
+    setChangeOwnerData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      mobile: "",
+      address1: "",
+      address2: "",
+      city: "",
+      state: "",
+      country: "",
+      zipcode: "",
+    });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setCsvFile(e.target.files[0]);
     }
+  };
+
+  const handleChangeOwnerInputChange = (field: string, value: string) => {
+    setChangeOwnerData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleOwnerSelect = (owner: (typeof mockOwners)[0]) => {
+    setChangeOwnerData({
+      firstName: owner.firstName,
+      lastName: owner.lastName,
+      email: owner.email,
+      mobile: owner.mobile,
+      address1: owner.address1,
+      address2: owner.address2,
+      state: owner.state,
+      city: owner.city,
+      country: owner.country,
+      zipcode: owner.zipcode,
+    });
+    setOwnerSearchTerm(owner.name);
+    setShowOwnerDropdown(false);
+  };
+
+  const isChangeOwnerFormValid = () => {
+    const { firstName, lastName, email, mobile } = changeOwnerData;
+    return firstName.trim() && lastName.trim() && email.trim() && mobile.trim();
   };
 
   return (
@@ -460,15 +606,15 @@ export default function UnitsScreen() {
                     className="px-4 py-2 bg-[#1FA372] text-white text-sm font-semibold rounded-lg hover:bg-[#188f5f] transition-colors cursor-pointer whitespace-nowrap flex items-center space-x-2"
                   >
                     <i className="ri-add-line text-lg"></i>
-                    <span>Add Unit</span>
+                    <span>Add / Change Unit</span>
                   </button>
 
                   {showAddUnitPopover && (
-                    <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                    <div className="absolute right-0 top-full mt-2 w-[500px] bg-white rounded-lg shadow-xl border border-gray-200 z-50">
                       <div className="p-4">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-lg font-bold text-gray-900">
-                            Add Unit
+                            Add / Change Unit
                           </h3>
                           <button
                             onClick={() => setShowAddUnitPopover(false)}
@@ -499,6 +645,16 @@ export default function UnitsScreen() {
                           >
                             Bulk Units Upload
                           </button>
+                          <button
+                            onClick={() => setActiveTab("changeOwner")}
+                            className={`flex-1 px-1 py-1 rounded-full text-sm font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                              activeTab === "changeOwner"
+                                ? "bg-white text-[#1FA372] shadow-sm"
+                                : "text-gray-600 hover:text-gray-900"
+                            }`}
+                          >
+                            Change Owner
+                          </button>
                         </div>
 
                         {activeTab === "individual" ? (
@@ -527,7 +683,7 @@ export default function UnitsScreen() {
                               Active
                             </button>
                           </div>
-                        ) : (
+                        ) : activeTab === "bulk" ? (
                           <div className="space-y-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -564,6 +720,214 @@ export default function UnitsScreen() {
                               }`}
                             >
                               Active
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <div className="relative">
+                              <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                  <i className="ri-search-line text-gray-400 text-sm"></i>
+                                </div>
+                                <input
+                                  type="text"
+                                  value={ownerSearchTerm}
+                                  onChange={(e) => {
+                                    setOwnerSearchTerm(e.target.value);
+                                    setShowOwnerDropdown(true);
+                                  }}
+                                  onFocus={() => setShowOwnerDropdown(true)}
+                                  placeholder="Search owner by name"
+                                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+
+                              {showOwnerDropdown &&
+                                ownerSearchTerm &&
+                                filteredOwners.length > 0 && (
+                                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                    {filteredOwners.map((owner) => (
+                                      <div
+                                        key={owner.id}
+                                        onClick={() => handleOwnerSelect(owner)}
+                                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <div>
+                                            <p className="text-sm font-medium text-gray-900">
+                                              {owner.name}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                              {owner.email}
+                                            </p>
+                                          </div>
+                                          <i className="ri-arrow-right-s-line text-gray-400"></i>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  First Name
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.firstName}
+                                  onChange={(e) =>
+                                    handleChangeOwnerInputChange(
+                                      "firstName",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter first name"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Last Name
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.lastName}
+                                  onChange={(e) =>
+                                    handleChangeOwnerInputChange(
+                                      "lastName",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter last name"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Email ID
+                                </label>
+                                <input
+                                  type="email"
+                                  value={changeOwnerData.email}
+                                  onChange={(e) =>
+                                    handleChangeOwnerInputChange(
+                                      "email",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter email address"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Mobile Number
+                                </label>
+                                <input
+                                  type="tel"
+                                  value={changeOwnerData.mobile}
+                                  onChange={(e) =>
+                                    handleChangeOwnerInputChange(
+                                      "mobile",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter mobile number"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Address 1
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.address1}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm cursor-not-allowed"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Address 2
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.address2}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm cursor-not-allowed"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  City
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.city}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm cursor-not-allowed"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  State
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.state}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm cursor-not-allowed"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Country
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.country}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm cursor-not-allowed"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Zipcode
+                                </label>
+                                <input
+                                  type="text"
+                                  value={changeOwnerData.zipcode}
+                                  readOnly
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm cursor-not-allowed"
+                                />
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={handleChangeOwnerSubmit}
+                              disabled={!isChangeOwnerFormValid()}
+                              className={`w-full py-2 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                                isChangeOwnerFormValid()
+                                  ? "bg-[#1FA372] text-white hover:bg-[#188f5f]"
+                                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              }`}
+                            >
+                              Submit
                             </button>
                           </div>
                         )}

@@ -252,11 +252,11 @@ export default function SendViolationModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900">
-            Send Violation Notice
+            Violation Details:
           </h3>
           <button
             onClick={() => {
@@ -273,130 +273,209 @@ export default function SendViolationModal({
           </button>
         </div>
 
-        <div className="space-y-6">
-          <div>
-            <label className="block text-base font-medium text-black mb-2">
-              Search Resident <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i className="ri-search-line text-gray-400"></i>
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-[45%] border-r border-gray-200 p-6 overflow-y-auto bg-gray-50">
+            <div className="mb-6">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i className="ri-search-line text-gray-400"></i>
+                </div>
+                <input
+                  type="text"
+                  value={userSearchTerm}
+                  onChange={(e) => {
+                    setUserSearchTerm(e.target.value);
+                    setShowUserDropdown(true);
+                    if (!e.target.value) {
+                      setSelectedUser("");
+                    }
+                  }}
+                  onFocus={() => setShowUserDropdown(true)}
+                  placeholder="Search address"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1FA372] focus:border-transparent"
+                />
+
+                {showUserDropdown &&
+                  userSearchTerm &&
+                  filteredUsers.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredUsers.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => handleUserSelect(user)}
+                          className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 cursor-pointer"
+                        >
+                          <div className="font-medium text-gray-900">
+                            {user.name}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {user.unit} • {user.email}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
               </div>
-              <input
-                type="text"
-                value={userSearchTerm}
-                onChange={(e) => {
-                  setUserSearchTerm(e.target.value);
-                  setShowUserDropdown(true);
-                  if (!e.target.value) {
-                    setSelectedUser("");
-                  }
-                }}
-                onFocus={() => setShowUserDropdown(true)}
-                placeholder="Search by address..."
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1FA372] focus:border-transparent"
-              />
+            </div>
 
-              {showUserDropdown &&
-                userSearchTerm &&
-                usersData &&
-                usersData.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                    {usersData.map((user: any) => (
-                      <button
-                        key={user.id}
-                        onClick={() => handleUserSelect(user)}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 cursor-pointer"
-                      >
-                        <div className="font-medium text-gray-900">
-                          {user.name}
+            <div>
+              <h4 className="text-base font-semibold text-gray-900 mb-4">
+                Select violation type
+              </h4>
+              <div className="space-y-2">
+                {defaultViolationsData &&
+                  defaultViolationsData.violationDefaults.map((violation) => (
+                    <button
+                      key={violation.id}
+                      onClick={() => handleViolationTypeChange(violation.id)}
+                      disabled={!selectedUser}
+                      className={`w-full p-4 rounded-lg border-2 transition-all text-left flex items-center space-x-3 cursor-pointer ${
+                        !selectedUser
+                          ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
+                          : selectedViolationType === violation.id
+                          ? "border-[#1FA372] bg-[#1FA372]/10"
+                          : "border-gray-200 bg-white hover:border-[#1FA372] hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="text-2xl">
+                        {violationIcons[violation.violationType.toLowerCase()]}
+                      </div>
+                      <div className="flex-1">
+                        <div
+                          className={`text-sm font-medium ${
+                            !selectedUser ? "text-gray-400" : "text-gray-900"
+                          }`}
+                        >
+                          {violation.violationType}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          {user.unit} • {user.email}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                      </div>
+                    </button>
+                  ))}
+              </div>
             </div>
           </div>
 
-          <div>
-            <label className="block text-base font-medium text-black mb-3">
-              Violation Type <span className="text-red-500">*</span>
-            </label>
-            <div className="grid grid-cols-3 gap-3">
-              {defaultViolationsData &&
-                defaultViolationsData.violationDefaults.map((violation) => (
+          <div className="w-[55%] p-6 overflow-y-auto">
+            {selectedViolationType ? (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Type of Violation:
+                  </label>
+                  <input
+                    type="text"
+                    value={
+                      violationTypes.find((v) => v.id === selectedViolationType)
+                        ?.name || ""
+                    }
+                    readOnly
+                    className="w-full px-3 py-2 border-b border-gray-300 text-sm focus:outline-none bg-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description of Violation:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter description"
+                    className="w-full px-3 py-2 border-b border-gray-300 text-sm focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Section of CC&Rs Violated:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter section"
+                    className="w-full px-3 py-2 border-b border-gray-300 text-sm focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Date Observed:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter date"
+                    className="w-full px-3 py-2 border-b border-gray-300 text-sm focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Time Observed:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter time"
+                    className="w-full px-3 py-2 border-b border-gray-300 text-sm focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Reported By (if applicable):
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter reporter name"
+                    className="w-full px-3 py-2 border-b border-gray-300 text-sm focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Photographic / Witness Evidence (if applicable): [Attach or
+                    insert details here]
+                  </label>
+                  <textarea
+                    placeholder="Enter evidence details"
+                    className="w-full px-3 py-2 border-b border-gray-300 text-sm focus:outline-none resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-6">
                   <button
-                    key={violation.id}
-                    onClick={() => handleViolationTypeChange(violation.id)}
-                    className={`p-3 rounded-lg border-2 transition-all text-center hover:border-[#1FA372] cursor-pointer ${
-                      selectedViolationType === violation.id
-                        ? "border-[#1FA372] bg-[#1FA372]/10 text-[#1FA372]"
-                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                    }`}
+                    onClick={() => {
+                      alert("Saved for later");
+                    }}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors whitespace-nowrap cursor-pointer"
                   >
-                    <div className="text-2xl mb-1">
-                      {violationIcons[violation.violationType.toLowerCase()]}
-                    </div>
-                    <div className="text-xs font-medium leading-tight break-words">
-                      {violation.violationType}
-                    </div>
+                    Save for later
                   </button>
-                ))}
-            </div>
+                  <button
+                    onClick={() => {
+                      alert("Review initiated");
+                    }}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors whitespace-nowrap cursor-pointer"
+                  >
+                    Review
+                  </button>
+                  <button
+                    onClick={handleSendViolation}
+                    className="px-6 py-2 bg-[#1FA372] text-white rounded-lg font-medium hover:bg-[#188f5f] transition-colors whitespace-nowrap cursor-pointer"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-gray-400">
+                  <i className="ri-file-list-3-line text-5xl mb-3"></i>
+                  <p className="text-sm">
+                    Select an address and violation type to view details
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
-
-          <div>
-            <label className="block text-base font-medium text-black mb-2">
-              Violation Notice Content <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={violationContent}
-              onChange={(e) => setViolationContent(e.target.value)}
-              placeholder="Select a violation type to see default content, or write your own message..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1FA372] focus:border-transparent"
-              rows={8}
-              maxLength={500}
-            />
-            <div className="flex justify-between items-center mt-2">
-              <p className="text-xs text-gray-500">
-                You can edit the default content or write your own message
-              </p>
-              <p className="text-xs text-gray-500">
-                {violationContent.length}/500 characters
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex space-x-3 mt-8">
-          <button
-            onClick={() => {
-              onClose();
-              setSelectedUser("");
-              setSelectedViolationType("");
-              setViolationContent("");
-              setUserSearchTerm("");
-              setShowUserDropdown(false);
-            }}
-            className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors whitespace-nowrap cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSendViolation}
-            disabled={
-              !selectedUser ||
-              !selectedViolationType ||
-              !violationContent.trim()
-            }
-            className="flex-1 bg-[#1FA372] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#188f5f] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors whitespace-nowrap cursor-pointer"
-          >
-            <i className="ri-send-plane-line mr-2"></i>
-            Send Violation Notice
-          </button>
         </div>
       </div>
     </div>
