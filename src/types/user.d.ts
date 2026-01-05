@@ -45,3 +45,20 @@ type userLoginResponseType = {
   token: string;
   user: user;
 };
+
+type UserType = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  emailId: string;
+  mobileNumber: string;
+  unitId: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  membershipId: string;
+  role: string;
+};

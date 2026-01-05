@@ -29,10 +29,7 @@ type ViolationRequestType = {
   violationDate: string;
   description: string;
   violationPicture: string;
-  dynamicValues: {
-    vehicleDescription: string;
-    licensePlate: string;
-  };
+  dynamicValues: any;
 };
 
 type ViolationResponseType = {

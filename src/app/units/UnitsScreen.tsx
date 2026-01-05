@@ -44,6 +44,19 @@ export default function UnitsScreen() {
   const [ownerSearchTerm, setOwnerSearchTerm] = useState("");
   const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
 
+  const [individualUnitData, setIndividualUnitData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    mobile: "",
+    address1: "",
+    address2: "",
+    state: "",
+    city: "",
+    country: "",
+    zipcode: "",
+  });
+
   const [changeOwnerData, setChangeOwnerData] = useState({
     firstName: "",
     lastName: "",
@@ -425,6 +438,18 @@ export default function UnitsScreen() {
     setShowDocumentModal(true);
   };
 
+  const isIndividualUnitFormValid = () => {
+    const { firstName, lastName, email, mobile } = individualUnitData;
+    return firstName.trim() && lastName.trim() && email.trim() && mobile.trim();
+  };
+
+  const handleIndividualUnitInputChange = (field: string, value: string) => {
+    setIndividualUnitData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   const handleIndividualUnitSubmit = () => {
     if (emailId.trim()) {
       console.log("Adding individual unit with email:", emailId);
@@ -659,28 +684,201 @@ export default function UnitsScreen() {
 
                         {activeTab === "individual" ? (
                           <div className="space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Email ID
-                              </label>
-                              <input
-                                type="email"
-                                value={emailId}
-                                onChange={(e) => setEmailId(e.target.value)}
-                                placeholder="Enter email address"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
-                              />
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  First Name
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.firstName}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "firstName",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter first name"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Last Name
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.lastName}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "lastName",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter last name"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
                             </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Email ID
+                                </label>
+                                <input
+                                  type="email"
+                                  value={individualUnitData.email}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "email",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter email address"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Mobile Number
+                                </label>
+                                <input
+                                  type="tel"
+                                  value={individualUnitData.mobile}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "mobile",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter mobile number"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Address 1
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.address1}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "address1",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter address 1"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Address 2
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.address2}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "address2",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter address 2"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  City
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.city}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "city",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter city"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  State
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.state}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "state",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter state"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Country
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.country}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "country",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter country"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Zipcode
+                                </label>
+                                <input
+                                  type="text"
+                                  value={individualUnitData.zipcode}
+                                  onChange={(e) =>
+                                    handleIndividualUnitInputChange(
+                                      "zipcode",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter zipcode"
+                                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1FA372] focus:border-transparent outline-none transition-all text-sm"
+                                />
+                              </div>
+                            </div>
+
                             <button
                               onClick={handleIndividualUnitSubmit}
-                              disabled={!emailId.trim()}
+                              disabled={!isIndividualUnitFormValid()}
                               className={`w-full py-2 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer ${
-                                emailId.trim()
+                                isIndividualUnitFormValid()
                                   ? "bg-[#1FA372] text-white hover:bg-[#188f5f]"
                                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
                               }`}
                             >
-                              Active
+                              Submit
                             </button>
                           </div>
                         ) : activeTab === "bulk" ? (

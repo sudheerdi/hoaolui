@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import AddEventModal from './AddEventModal';
-import UserProfile from '../../components/UserProfile';
+import { useState } from "react";
+import AddEventModal from "./AddEventModal";
+import UserProfile from "../../components/UserProfile";
 
 interface Event {
   id: string;
   title: string;
   date: string;
   time: string;
-  type: 'meeting' | 'reminder' | 'community';
+  type: "meeting" | "reminder" | "community";
   location?: string;
   attendees?: string[];
   description?: string;
@@ -26,221 +26,235 @@ export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(true);
-  const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('month');
+  const [viewMode, setViewMode] = useState<"day" | "week" | "month">("month");
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [reservationData, setReservationData] = useState({
-    amenity: '',
-    date: '',
-    time: ''
+    amenity: "",
+    date: "",
+    time: "",
   });
 
   // Mock amenities data
   const amenities: Amenity[] = [
-    { id: '1', name: 'Community Pool', available: true },
-    { id: '2', name: 'Tennis Court', available: false },
-    { id: '3', name: 'Clubhouse', available: true },
-    { id: '4', name: 'Gym', available: true },
-    { id: '5', name: 'BBQ Area', available: false },
-    { id: '6', name: 'Conference Room', available: true }
+    { id: "1", name: "Community Pool", available: true },
+    { id: "2", name: "Tennis Court", available: false },
+    { id: "3", name: "Clubhouse", available: true },
+    { id: "4", name: "Gym", available: true },
+    { id: "5", name: "BBQ Area", available: false },
+    { id: "6", name: "Conference Room", available: true },
   ];
 
   const [events, setEvents] = useState<Event[]>([
     {
-      id: '1',
-      title: 'HOA Board Meeting',
-      date: '2025-01-15',
-      time: '18:00',
-      type: 'meeting',
-      location: 'Community Center',
-      attendees: ['Board Members', 'Property Manager'],
-      description: 'Monthly board meeting to discuss community matters'
+      id: "1",
+      title: "HOA Board Meeting",
+      date: "2025-01-15",
+      time: "18:00",
+      type: "meeting",
+      location: "Community Center",
+      attendees: ["Board Members", "Property Manager"],
+      description: "Monthly board meeting to discuss community matters",
     },
     {
-      id: '2',
-      title: 'Pool Maintenance',
-      date: '2025-01-18',
-      time: '09:00',
-      type: 'reminder',
-      location: 'Community Pool',
-      description: 'Scheduled pool cleaning and chemical balance check'
+      id: "2",
+      title: "Pool Maintenance",
+      date: "2025-01-18",
+      time: "09:00",
+      type: "reminder",
+      location: "Community Pool",
+      description: "Scheduled pool cleaning and chemical balance check",
     },
     {
-      id: '3',
-      title: 'Community BBQ',
-      date: '2025-01-20',
-      time: '17:00',
-      type: 'community',
-      location: 'Central Courtyard',
-      attendees: ['All Residents'],
-      description: 'Monthly community gathering and BBQ event'
+      id: "3",
+      title: "Community BBQ",
+      date: "2025-01-20",
+      time: "17:00",
+      type: "community",
+      location: "Central Courtyard",
+      attendees: ["All Residents"],
+      description: "Monthly community gathering and BBQ event",
     },
     {
-      id: '4',
-      title: 'Security System Check',
-      date: '2025-01-22',
-      time: '10:00',
-      type: 'reminder',
-      location: 'Main Entrance',
-      description: 'Quarterly security system inspection'
+      id: "4",
+      title: "Security System Check",
+      date: "2025-01-22",
+      time: "10:00",
+      type: "reminder",
+      location: "Main Entrance",
+      description: "Quarterly security system inspection",
     },
     {
-      id: '5',
-      title: 'Neighborhood Watch Meeting',
-      date: '2025-01-25',
-      time: '19:00',
-      type: 'meeting',
-      location: 'Community Room',
-      attendees: ['Watch Members'],
-      description: 'Monthly neighborhood watch coordination meeting'
+      id: "5",
+      title: "Neighborhood Watch Meeting",
+      date: "2025-01-25",
+      time: "19:00",
+      type: "meeting",
+      location: "Community Room",
+      attendees: ["Watch Members"],
+      description: "Monthly neighborhood watch coordination meeting",
     },
     {
-      id: '6',
-      title: 'Landscaping Work',
-      date: '2025-01-28',
-      time: '08:00',
-      type: 'reminder',
-      location: 'Garden Areas',
-      description: 'Monthly landscaping and garden maintenance'
+      id: "6",
+      title: "Landscaping Work",
+      date: "2025-01-28",
+      time: "08:00",
+      type: "reminder",
+      location: "Garden Areas",
+      description: "Monthly landscaping and garden maintenance",
     },
     {
-      id: '7',
-      title: 'Fire Safety Inspection',
-      date: '2025-01-30',
-      time: '11:00',
-      type: 'reminder',
-      location: 'All Buildings',
-      attendees: ['Fire Department'],
-      description: 'Annual fire safety equipment inspection'
+      id: "7",
+      title: "Fire Safety Inspection",
+      date: "2025-01-30",
+      time: "11:00",
+      type: "reminder",
+      location: "All Buildings",
+      attendees: ["Fire Department"],
+      description: "Annual fire safety equipment inspection",
     },
     {
-      id: '8',
-      title: 'Yoga Class',
-      date: '2025-02-02',
-      time: '07:00',
-      type: 'community',
-      location: 'Recreation Center',
-      attendees: ['Residents'],
-      description: 'Weekly morning yoga session for residents'
+      id: "8",
+      title: "Yoga Class",
+      date: "2025-02-02",
+      time: "07:00",
+      type: "community",
+      location: "Recreation Center",
+      attendees: ["Residents"],
+      description: "Weekly morning yoga session for residents",
     },
     {
-      id: '9',
-      title: 'Budget Review Meeting',
-      date: '2025-02-05',
-      time: '19:30',
-      type: 'meeting',
-      location: 'Conference Room',
-      attendees: ['Board Members', 'Treasurer'],
-      description: 'Quarterly budget review and financial planning'
+      id: "9",
+      title: "Budget Review Meeting",
+      date: "2025-02-05",
+      time: "19:30",
+      type: "meeting",
+      location: "Conference Room",
+      attendees: ["Board Members", "Treasurer"],
+      description: "Quarterly budget review and financial planning",
     },
     {
-      id: '10',
-      title: 'Elevator Maintenance',
-      date: '2025-02-08',
-      time: '09:30',
-      type: 'reminder',
-      location: 'Building A & B',
-      description: 'Scheduled elevator inspection and maintenance'
+      id: "10",
+      title: "Elevator Maintenance",
+      date: "2025-02-08",
+      time: "09:30",
+      type: "reminder",
+      location: "Building A & B",
+      description: "Scheduled elevator inspection and maintenance",
     },
     {
-      id: '11',
-      title: 'Book Club Meeting',
-      date: '2025-02-10',
-      time: '15:00',
-      type: 'community',
-      location: 'Library Room',
-      attendees: ['Book Club Members'],
-      description: 'Monthly book discussion and social gathering'
+      id: "11",
+      title: "Book Club Meeting",
+      date: "2025-02-10",
+      time: "15:00",
+      type: "community",
+      location: "Library Room",
+      attendees: ["Book Club Members"],
+      description: "Monthly book discussion and social gathering",
     },
     {
-      id: '12',
-      title: 'HVAC System Check',
-      date: '2025-02-12',
-      time: '10:30',
-      type: 'reminder',
-      location: 'All Units',
-      description: 'Seasonal HVAC system inspection and filter replacement'
+      id: "12",
+      title: "HVAC System Check",
+      date: "2025-02-12",
+      time: "10:30",
+      type: "reminder",
+      location: "All Units",
+      description: "Seasonal HVAC system inspection and filter replacement",
     },
     {
-      id: '13',
-      title: 'Annual General Meeting',
-      date: '2025-02-15',
-      time: '18:30',
-      type: 'meeting',
-      location: 'Main Hall',
-      attendees: ['All Residents', 'Board Members'],
-      description: 'Annual meeting to discuss community updates and vote on important matters'
+      id: "13",
+      title: "Annual General Meeting",
+      date: "2025-02-15",
+      time: "18:30",
+      type: "meeting",
+      location: "Main Hall",
+      attendees: ["All Residents", "Board Members"],
+      description:
+        "Annual meeting to discuss community updates and vote on important matters",
     },
     {
-      id: '14',
-      title: 'Tennis Court Resurfacing',
-      date: '2025-02-18',
-      time: '08:00',
-      type: 'reminder',
-      location: 'Tennis Courts',
-      description: 'Annual tennis court maintenance and resurfacing work'
+      id: "14",
+      title: "Tennis Court Resurfacing",
+      date: "2025-02-18",
+      time: "08:00",
+      type: "reminder",
+      location: "Tennis Courts",
+      description: "Annual tennis court maintenance and resurfacing work",
     },
     {
-      id: '15',
-      title: 'Community Movie Night',
-      date: '2025-02-20',
-      time: '19:00',
-      type: 'community',
-      location: 'Recreation Center',
-      attendees: ['All Residents'],
-      description: 'Monthly outdoor movie screening for families'
+      id: "15",
+      title: "Community Movie Night",
+      date: "2025-02-20",
+      time: "19:00",
+      type: "community",
+      location: "Recreation Center",
+      attendees: ["All Residents"],
+      description: "Monthly outdoor movie screening for families",
     },
     {
-      id: '16',
-      title: 'Parking Lot Cleaning',
-      date: '2025-02-22',
-      time: '06:00',
-      type: 'reminder',
-      location: 'All Parking Areas',
-      description: 'Deep cleaning and line repainting of parking areas'
+      id: "16",
+      title: "Parking Lot Cleaning",
+      date: "2025-02-22",
+      time: "06:00",
+      type: "reminder",
+      location: "All Parking Areas",
+      description: "Deep cleaning and line repainting of parking areas",
     },
     {
-      id: '17',
-      title: 'Emergency Preparedness Workshop',
-      date: '2025-02-25',
-      time: '14:00',
-      type: 'community',
-      location: 'Community Center',
-      attendees: ['All Residents'],
-      description: 'Educational workshop on emergency preparedness and safety procedures'
+      id: "17",
+      title: "Emergency Preparedness Workshop",
+      date: "2025-02-25",
+      time: "14:00",
+      type: "community",
+      location: "Community Center",
+      attendees: ["All Residents"],
+      description:
+        "Educational workshop on emergency preparedness and safety procedures",
     },
     {
-      id: '18',
-      title: 'Roof Inspection',
-      date: '2025-02-28',
-      time: '09:00',
-      type: 'reminder',
-      location: 'All Buildings',
-      attendees: ['Maintenance Team'],
-      description: 'Quarterly roof inspection and gutter cleaning'
+      id: "18",
+      title: "Roof Inspection",
+      date: "2025-02-28",
+      time: "09:00",
+      type: "reminder",
+      location: "All Buildings",
+      attendees: ["Maintenance Team"],
+      description: "Quarterly roof inspection and gutter cleaning",
     },
     {
-      id: '19',
-      title: 'Spring Festival Planning',
-      date: '2025-03-03',
-      time: '18:00',
-      type: 'meeting',
-      location: 'Conference Room',
-      attendees: ['Event Committee'],
-      description: 'Planning meeting for the annual spring community festival'
+      id: "19",
+      title: "Spring Festival Planning",
+      date: "2025-03-03",
+      time: "18:00",
+      type: "meeting",
+      location: "Conference Room",
+      attendees: ["Event Committee"],
+      description: "Planning meeting for the annual spring community festival",
     },
     {
-      id: '20',
-      title: 'Playground Equipment Check',
-      date: '2025-03-05',
-      time: '10:00',
-      type: 'reminder',
-      location: 'Children\'s Playground',
-      description: 'Monthly safety inspection of playground equipment'
-    }
+      id: "20",
+      title: "Playground Equipment Check",
+      date: "2025-03-05",
+      time: "10:00",
+      type: "reminder",
+      location: "Children's Playground",
+      description: "Monthly safety inspection of playground equipment",
+    },
   ]);
 
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -256,36 +270,50 @@ export default function CalendarScreen() {
   const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate);
 
   const goToPreviousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
   };
 
   const getEventsForDate = (day: number) => {
-    const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return events.filter(event => event.date === dateStr);
+    const dateStr = `${currentDate.getFullYear()}-${String(
+      currentDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    return events.filter((event) => event.date === dateStr);
   };
 
   const handleDateClick = (day: number) => {
-    const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    const clickedDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day
+    );
     setSelectedDate(clickedDate);
   };
 
   const getSelectedDateEvents = () => {
     if (!selectedDate) return [];
-    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
-    return events.filter(event => event.date === dateStr);
+    const dateStr = `${selectedDate.getFullYear()}-${String(
+      selectedDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+    return events.filter((event) => event.date === dateStr);
   };
 
   const getCurrentMonthEvents = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
     return events
-      .filter(event => {
+      .filter((event) => {
         const eventDate = new Date(event.date);
-        return eventDate.getFullYear() === year && eventDate.getMonth() + 1 === month;
+        return (
+          eventDate.getFullYear() === year && eventDate.getMonth() + 1 === month
+        );
       })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   };
@@ -293,79 +321,90 @@ export default function CalendarScreen() {
   const getUpcomingEvents = () => {
     const today = new Date();
     return events
-      .filter(event => new Date(event.date) >= today)
+      .filter((event) => new Date(event.date) >= today)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   };
 
-  const handleAddEvent = (newEvent: Omit<Event, 'id'>) => {
+  const handleAddEvent = (newEvent: Omit<Event, "id">) => {
     const event: Event = {
       ...newEvent,
-      id: Date.now().toString()
+      id: Date.now().toString(),
     };
     setEvents([...events, event]);
   };
 
   const handleDeleteEvent = (eventId: string) => {
-    setEvents(events.filter(e => e.id !== eventId));
+    setEvents(events.filter((e) => e.id !== eventId));
   };
 
   const getEventIcon = (type: string) => {
     switch (type) {
-      case 'meeting':
-        return 'ri-team-line';
-      case 'reminder':
-        return 'ri-alarm-line';
-      case 'community':
-        return 'ri-community-line';
+      case "meeting":
+        return "ri-team-line";
+      case "reminder":
+        return "ri-alarm-line";
+      case "community":
+        return "ri-community-line";
       default:
-        return 'ri-calendar-line';
+        return "ri-calendar-line";
     }
   };
 
   const getEventColor = (type: string) => {
     switch (type) {
-      case 'meeting':
-        return 'bg-teal-500';
-      case 'reminder':
-        return 'bg-amber-500';
-      case 'community':
-        return 'bg-purple-500';
+      case "meeting":
+        return "bg-teal-500";
+      case "reminder":
+        return "bg-amber-500";
+      case "community":
+        return "bg-purple-500";
       default:
-        return 'bg-gray-500';
+        return "bg-gray-500";
     }
   };
 
   const formatEventDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   const checkAvailability = () => {
-    const selectedAmenity = amenities.find(a => a.id === reservationData.amenity);
+    const selectedAmenity = amenities.find(
+      (a) => a.id === reservationData.amenity
+    );
     return selectedAmenity?.available || false;
   };
 
   const isReservationFormValid = () => {
-    return reservationData.amenity && reservationData.date && reservationData.time && checkAvailability();
+    return (
+      reservationData.amenity &&
+      reservationData.date &&
+      reservationData.time &&
+      checkAvailability()
+    );
   };
 
   const handleReservationSubmit = () => {
     if (isReservationFormValid()) {
       // Handle reservation submission
       setShowReservationModal(false);
-      setReservationData({ amenity: '', date: '', time: '' });
+      setReservationData({ amenity: "", date: "", time: "" });
     }
   };
 
   // Day view helper functions
   const getDayViewEvents = () => {
     if (!selectedDate) return [];
-    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
-    return events.filter(event => event.date === dateStr).sort((a, b) => a.time.localeCompare(b.time));
+    const dateStr = `${selectedDate.getFullYear()}-${String(
+      selectedDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+    return events
+      .filter((event) => event.date === dateStr)
+      .sort((a, b) => a.time.localeCompare(b.time));
   };
 
   // Week view helper functions
@@ -373,7 +412,7 @@ export default function CalendarScreen() {
     const today = selectedDate || currentDate;
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay());
-    
+
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(startOfWeek);
@@ -384,8 +423,10 @@ export default function CalendarScreen() {
   };
 
   const getEventsForWeekDate = (date: Date) => {
-    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    return events.filter(event => event.date === dateStr);
+    const dateStr = `${date.getFullYear()}-${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    return events.filter((event) => event.date === dateStr);
   };
 
   const renderDayView = () => {
@@ -396,55 +437,74 @@ export default function CalendarScreen() {
       <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
         <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            {displayDate.toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            {displayDate.toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </h3>
         </div>
-        
+
         <div className="p-4">
           {dayEvents.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i className="ri-calendar-line text-2xl text-gray-400"></i>
               </div>
-              <p className="text-base font-medium text-black">No events scheduled for this day</p>
+              <p className="text-base font-medium text-black">
+                No events scheduled for this day
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {dayEvents.map(event => (
-                <div key={event.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              {dayEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg ${getEventColor(event.type)} flex items-center justify-center`}>
-                        <i className={`${getEventIcon(event.type)} text-white text-lg`}></i>
+                      <div
+                        className={`w-10 h-10 rounded-lg ${getEventColor(
+                          event.type
+                        )} flex items-center justify-center`}
+                      >
+                        <i
+                          className={`${getEventIcon(
+                            event.type
+                          )} text-white text-lg`}
+                        ></i>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">{event.title}</h4>
-                        <p className="text-base font-medium text-black">{event.time}</p>
+                        <h4 className="font-semibold text-gray-900">
+                          {event.title}
+                        </h4>
+                        <p className="text-base font-medium text-black">
+                          {event.time}
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {event.location && (
                     <div className="flex items-center gap-2 text-base font-medium text-black mb-2">
                       <i className="ri-map-pin-line"></i>
                       <span>{event.location}</span>
                     </div>
                   )}
-                  
+
                   {event.attendees && event.attendees.length > 0 && (
                     <div className="flex items-center gap-2 text-base font-medium text-black mb-2">
                       <i className="ri-group-line"></i>
-                      <span>{event.attendees.join(', ')}</span>
+                      <span>{event.attendees.join(", ")}</span>
                     </div>
                   )}
-                  
+
                   {event.description && (
-                    <p className="text-base font-medium text-black">{event.description}</p>
+                    <p className="text-base font-medium text-black">
+                      {event.description}
+                    </p>
                   )}
                 </div>
               ))}
@@ -463,32 +523,42 @@ export default function CalendarScreen() {
         <div className="bg-gray-50 border-b border-gray-200">
           <div className="grid grid-cols-7">
             {weekDates.map((date, index) => (
-              <div key={index} className="px-3 py-3 text-center border-r border-gray-200 last:border-r-0">
+              <div
+                key={index}
+                className="px-3 py-3 text-center border-r border-gray-200 last:border-r-0"
+              >
                 <div className="text-sm font-semibold text-black uppercase">
-                  {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                  {date.toLocaleDateString("en-US", { weekday: "short" })}
                 </div>
-                <div className={`text-lg font-medium mt-1 ${
-                  date.toDateString() === new Date().toDateString() 
-                    ? 'text-teal-600' 
-                    : 'text-gray-900'
-                }`}>
+                <div
+                  className={`text-lg font-medium mt-1 ${
+                    date.toDateString() === new Date().toDateString()
+                      ? "text-teal-600"
+                      : "text-gray-900"
+                  }`}
+                >
                   {date.getDate()}
                 </div>
               </div>
             ))}
           </div>
         </div>
-        
+
         <div className="grid grid-cols-7 min-h-[400px]">
           {weekDates.map((date, index) => {
             const dayEvents = getEventsForWeekDate(date);
             return (
-              <div key={index} className="border-r border-gray-200 last:border-r-0 p-2">
+              <div
+                key={index}
+                className="border-r border-gray-200 last:border-r-0 p-2"
+              >
                 <div className="space-y-1">
-                  {dayEvents.map(event => (
+                  {dayEvents.map((event) => (
                     <div
                       key={event.id}
-                      className={`p-2 rounded text-sm font-medium text-white ${getEventColor(event.type)} cursor-pointer hover:opacity-80`}
+                      className={`p-2 rounded text-sm font-medium text-white ${getEventColor(
+                        event.type
+                      )} cursor-pointer hover:opacity-80`}
                       title={`${event.title} - ${event.time}`}
                     >
                       <div className="font-medium truncate">{event.title}</div>
@@ -509,43 +579,60 @@ export default function CalendarScreen() {
       <div className="border border-gray-200 rounded-lg overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <th key={day} className="text-center text-sm font-semibold text-black py-3 border-r border-gray-200 last:border-r-0">
+            <tr className="bg-[#DCDCDC]">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                <th
+                  key={day}
+                  className="text-center text-sm font-semibold text-black py-3 border-r border-gray-200 last:border-r-0"
+                >
                   {day}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: Math.ceil((daysInMonth + startingDayOfWeek) / 7) }).map((_, weekIndex) => (
+            {Array.from({
+              length: Math.ceil((daysInMonth + startingDayOfWeek) / 7),
+            }).map((_, weekIndex) => (
               <tr key={weekIndex}>
                 {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  const dayNumber = weekIndex * 7 + dayIndex - startingDayOfWeek + 1;
+                  const dayNumber =
+                    weekIndex * 7 + dayIndex - startingDayOfWeek + 1;
                   const isValidDay = dayNumber > 0 && dayNumber <= daysInMonth;
-                  const dayEvents = isValidDay ? getEventsForDate(dayNumber) : [];
-                  const isSelected = selectedDate?.getDate() === dayNumber && 
-                                   selectedDate?.getMonth() === currentDate.getMonth() &&
-                                   selectedDate?.getFullYear() === currentDate.getFullYear();
+                  const dayEvents = isValidDay
+                    ? getEventsForDate(dayNumber)
+                    : [];
+                  const isSelected =
+                    selectedDate?.getDate() === dayNumber &&
+                    selectedDate?.getMonth() === currentDate.getMonth() &&
+                    selectedDate?.getFullYear() === currentDate.getFullYear();
 
                   return (
                     <td
                       key={dayIndex}
                       onClick={() => isValidDay && handleDateClick(dayNumber)}
                       className={`h-20 border-r border-b border-gray-200 last:border-r-0 p-2 cursor-pointer hover:bg-gray-50 transition-colors ${
-                        isSelected ? 'bg-teal-50' : ''
-                      } ${!isValidDay ? 'bg-gray-50' : ''}`}
+                        isSelected ? "bg-teal-50" : ""
+                      } ${!isValidDay ? "bg-gray-50" : ""}`}
                     >
                       {isValidDay && (
                         <>
-                          <div className="text-base font-medium text-gray-900">{dayNumber}</div>
+                          <div className="text-base font-medium text-gray-900">
+                            {dayNumber}
+                          </div>
                           <div className="flex gap-1 mt-1 flex-wrap">
                             {dayEvents.slice(0, 3).map((event, idx) => (
                               <div
                                 key={idx}
-                                className={`w-4 h-4 rounded flex items-center justify-center ${getEventColor(event.type)}`}
+                                className={`w-4 h-4 rounded flex items-center justify-center ${getEventColor(
+                                  event.type
+                                )}`}
                               >
-                                <i className={`${getEventIcon(event.type)} text-white text-xs`}></i>
+                                <i
+                                  className={`${getEventIcon(
+                                    event.type
+                                  )} text-white text-xs`}
+                                ></i>
                               </div>
                             ))}
                           </div>
@@ -566,16 +653,19 @@ export default function CalendarScreen() {
     <div className="bg-white rounded-lg min-h-[calc(100vh-20px)] flex flex-col overflow-hidden">
       <div className="bg-white border-b border-gray-200 px-6 py-3 rounded-t-lg flex-shrink-0">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-          </div>
+          <div className="flex items-center gap-4"></div>
           <div className="flex items-center gap-4">
             <button className="relative w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer">
               <i className="ri-notification-3-line text-xl text-gray-600"></i>
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                3
+              </span>
             </button>
             <div className="text-sm text-gray-700">
               <div className="font-semibold">Sunset Gardens Community</div>
-              <div className="text-xs text-gray-500">1234 Garden View Drive, Miami, FL 33101</div>
+              <div className="text-xs text-gray-500">
+                1234 Garden View Drive, Miami, FL 33101
+              </div>
             </div>
             <UserProfile />
           </div>
@@ -595,12 +685,21 @@ export default function CalendarScreen() {
                     <i className="ri-arrow-left-s-line text-lg"></i>
                   </button>
                   <h2 className="text-xl font-semibold text-gray-900">
-                    {viewMode === 'day' && selectedDate 
-                      ? selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                      : viewMode === 'week' 
-                        ? `Week of ${getWeekDates()[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-                        : currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-                    }
+                    {viewMode === "day" && selectedDate
+                      ? selectedDate.toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : viewMode === "week"
+                      ? `Week of ${getWeekDates()[0].toLocaleDateString(
+                          "en-US",
+                          { month: "short", day: "numeric" }
+                        )}`
+                      : currentDate.toLocaleDateString("en-US", {
+                          month: "long",
+                          year: "numeric",
+                        })}
                   </h2>
                   <button
                     onClick={goToNextMonth}
@@ -609,29 +708,35 @@ export default function CalendarScreen() {
                     <i className="ri-arrow-right-s-line text-lg"></i>
                   </button>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                   <div className="flex bg-gray-100 rounded-lg p-1">
                     <button
-                      onClick={() => setViewMode('day')}
+                      onClick={() => setViewMode("day")}
                       className={`px-3 py-1 text-sm rounded-md transition-colors whitespace-nowrap cursor-pointer ${
-                        viewMode === 'day' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                        viewMode === "day"
+                          ? "bg-white text-gray-900 shadow-sm"
+                          : "text-gray-600 hover:text-gray-900"
                       }`}
                     >
                       Day
                     </button>
                     <button
-                      onClick={() => setViewMode('week')}
+                      onClick={() => setViewMode("week")}
                       className={`px-3 py-1 text-sm rounded-md transition-colors whitespace-nowrap cursor-pointer ${
-                        viewMode === 'week' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                        viewMode === "week"
+                          ? "bg-white text-gray-900 shadow-sm"
+                          : "text-gray-600 hover:text-gray-900"
                       }`}
                     >
                       Week
                     </button>
                     <button
-                      onClick={() => setViewMode('month')}
+                      onClick={() => setViewMode("month")}
                       className={`px-3 py-1 text-sm rounded-md transition-colors whitespace-nowrap cursor-pointer ${
-                        viewMode === 'month' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                        viewMode === "month"
+                          ? "bg-white text-gray-900 shadow-sm"
+                          : "text-gray-600 hover:text-gray-900"
                       }`}
                     >
                       Month
@@ -651,7 +756,9 @@ export default function CalendarScreen() {
                       <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50">
                         <div className="p-4 border-b border-gray-200">
                           <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-900">Make a Reservation</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Make a Reservation
+                            </h3>
                             <button
                               onClick={() => setShowReservationModal(false)}
                               className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 cursor-pointer"
@@ -668,13 +775,19 @@ export default function CalendarScreen() {
                             </label>
                             <select
                               value={reservationData.amenity}
-                              onChange={(e) => setReservationData(prev => ({ ...prev, amenity: e.target.value }))}
+                              onChange={(e) =>
+                                setReservationData((prev) => ({
+                                  ...prev,
+                                  amenity: e.target.value,
+                                }))
+                              }
                               className="w-full px-3 py-2 text-base font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer pr-8"
                             >
                               <option value="">Choose an amenity...</option>
-                              {amenities.map(amenity => (
+                              {amenities.map((amenity) => (
                                 <option key={amenity.id} value={amenity.id}>
-                                  {amenity.name} {!amenity.available ? '(Unavailable)' : ''}
+                                  {amenity.name}{" "}
+                                  {!amenity.available ? "(Unavailable)" : ""}
                                 </option>
                               ))}
                             </select>
@@ -687,8 +800,13 @@ export default function CalendarScreen() {
                             <input
                               type="date"
                               value={reservationData.date}
-                              onChange={(e) => setReservationData(prev => ({ ...prev, date: e.target.value }))}
-                              min={new Date().toISOString().split('T')[0]}
+                              onChange={(e) =>
+                                setReservationData((prev) => ({
+                                  ...prev,
+                                  date: e.target.value,
+                                }))
+                              }
+                              min={new Date().toISOString().split("T")[0]}
                               className="w-full px-3 py-2 text-base font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                           </div>
@@ -700,7 +818,12 @@ export default function CalendarScreen() {
                             <input
                               type="time"
                               value={reservationData.time}
-                              onChange={(e) => setReservationData(prev => ({ ...prev, time: e.target.value }))}
+                              onChange={(e) =>
+                                setReservationData((prev) => ({
+                                  ...prev,
+                                  time: e.target.value,
+                                }))
+                              }
                               className="w-full px-3 py-2 text-base font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                           </div>
@@ -708,14 +831,29 @@ export default function CalendarScreen() {
                           {reservationData.amenity && (
                             <div className="p-3 rounded-lg border">
                               <div className="flex items-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${checkAvailability() ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                <span className={`text-base font-medium ${checkAvailability() ? 'text-green-700' : 'text-red-700'}`}>
-                                  {checkAvailability() ? 'Available' : 'Not Available'}
+                                <div
+                                  className={`w-3 h-3 rounded-full ${
+                                    checkAvailability()
+                                      ? "bg-green-500"
+                                      : "bg-red-500"
+                                  }`}
+                                ></div>
+                                <span
+                                  className={`text-base font-medium ${
+                                    checkAvailability()
+                                      ? "text-green-700"
+                                      : "text-red-700"
+                                  }`}
+                                >
+                                  {checkAvailability()
+                                    ? "Available"
+                                    : "Not Available"}
                                 </span>
                               </div>
                               {!checkAvailability() && (
                                 <p className="text-sm font-medium text-red-600 mt-1">
-                                  This amenity is currently unavailable for reservations.
+                                  This amenity is currently unavailable for
+                                  reservations.
                                 </p>
                               )}
                             </div>
@@ -735,8 +873,8 @@ export default function CalendarScreen() {
                               disabled={!isReservationFormValid()}
                               className={`px-6 py-2 text-base font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
                                 isReservationFormValid()
-                                  ? 'bg-[#1FA372] text-white hover:bg-[#188f5f]'
-                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                  ? "bg-[#1FA372] text-white hover:bg-[#188f5f]"
+                                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
                               }`}
                             >
                               <i className="ri-check-line mr-2"></i>
@@ -758,9 +896,9 @@ export default function CalendarScreen() {
                 </div>
               </div>
 
-              {viewMode === 'day' && renderDayView()}
-              {viewMode === 'week' && renderWeekView()}
-              {viewMode === 'month' && renderMonthView()}
+              {viewMode === "day" && renderDayView()}
+              {viewMode === "week" && renderWeekView()}
+              {viewMode === "month" && renderMonthView()}
             </div>
           </div>
         </div>
@@ -769,7 +907,14 @@ export default function CalendarScreen() {
           <div className="p-6 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                {selectedDate ? `Events for ${selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : `${currentDate.toLocaleDateString('en-US', { month: 'long' })} Events`}
+                {selectedDate
+                  ? `Events for ${selectedDate.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}`
+                  : `${currentDate.toLocaleDateString("en-US", {
+                      month: "long",
+                    })} Events`}
               </h3>
               {selectedDate && (
                 <button
@@ -785,46 +930,65 @@ export default function CalendarScreen() {
           <div className="p-4 space-y-3">
             {selectedDate ? (
               getSelectedDateEvents().length === 0 ? (
-                <p className="text-base font-medium text-black text-center py-8">No events scheduled for this date</p>
+                <p className="text-base font-medium text-black text-center py-8">
+                  No events scheduled for this date
+                </p>
               ) : (
-                getSelectedDateEvents().map(event => (
-                  <div key={event.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                getSelectedDateEvents().map((event) => (
+                  <div
+                    key={event.id}
+                    className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                  >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className={`w-8 h-8 rounded-lg ${getEventColor(event.type)} flex items-center justify-center`}>
-                          <i className={`${getEventIcon(event.type)} text-white text-sm`}></i>
+                        <div
+                          className={`w-8 h-8 rounded-lg ${getEventColor(
+                            event.type
+                          )} flex items-center justify-center`}
+                        >
+                          <i
+                            className={`${getEventIcon(
+                              event.type
+                            )} text-white text-sm`}
+                          ></i>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 text-base">{event.title}</h4>
-                          <p className="text-sm font-medium text-black">{event.time}</p>
+                          <h4 className="font-semibold text-gray-900 text-base">
+                            {event.title}
+                          </h4>
+                          <p className="text-sm font-medium text-black">
+                            {event.time}
+                          </p>
                         </div>
                       </div>
                     </div>
-                    
+
                     {event.location && (
                       <div className="flex items-center gap-2 text-sm font-medium text-black mb-1">
                         <i className="ri-map-pin-line"></i>
                         <span>{event.location}</span>
                       </div>
                     )}
-                    
+
                     {event.attendees && event.attendees.length > 0 && (
                       <div className="flex items-center gap-2 text-sm font-medium text-black mb-2">
                         <i className="ri-group-line"></i>
-                        <span>{event.attendees.join(', ')}</span>
+                        <span>{event.attendees.join(", ")}</span>
                       </div>
                     )}
-                    
+
                     {event.description && (
-                      <p className="text-sm font-medium text-black mb-3">{event.description}</p>
+                      <p className="text-sm font-medium text-black mb-3">
+                        {event.description}
+                      </p>
                     )}
-                    
+
                     <div className="flex gap-2">
                       <button className="flex-1 px-3 py-1.5 bg-[#1FA372] text-white rounded-lg hover:bg-[#188f5f] transition-colors text-sm font-medium cursor-pointer whitespace-nowrap">
                         <i className="ri-edit-line mr-1"></i>
                         Edit
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDeleteEvent(event.id)}
                         className="flex-1 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium cursor-pointer whitespace-nowrap"
                       >
@@ -835,37 +999,54 @@ export default function CalendarScreen() {
                   </div>
                 ))
               )
+            ) : getCurrentMonthEvents().length === 0 ? (
+              <p className="text-base font-medium text-black text-center py-8">
+                No events this month
+              </p>
             ) : (
-              getCurrentMonthEvents().length === 0 ? (
-                <p className="text-base font-medium text-black text-center py-8">No events this month</p>
-              ) : (
-                getCurrentMonthEvents().map(event => (
-                  <div key={event.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-8 h-8 rounded-lg ${getEventColor(event.type)} flex items-center justify-center`}>
-                          <i className={`${getEventIcon(event.type)} text-white text-sm`}></i>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900 text-base">{event.title}</h4>
-                          <p className="text-sm font-medium text-black">{formatEventDate(event.date)} at {event.time}</p>
-                        </div>
+              getCurrentMonthEvents().map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-8 h-8 rounded-lg ${getEventColor(
+                          event.type
+                        )} flex items-center justify-center`}
+                      >
+                        <i
+                          className={`${getEventIcon(
+                            event.type
+                          )} text-white text-sm`}
+                        ></i>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-base">
+                          {event.title}
+                        </h4>
+                        <p className="text-sm font-medium text-black">
+                          {formatEventDate(event.date)} at {event.time}
+                        </p>
                       </div>
                     </div>
-                    
-                    {event.location && (
-                      <div className="flex items-center gap-2 text-sm font-medium text-black mb-1">
-                        <i className="ri-map-pin-line"></i>
-                        <span>{event.location}</span>
-                      </div>
-                    )}
-                    
-                    {event.description && (
-                      <p className="text-sm font-medium text-black">{event.description}</p>
-                    )}
                   </div>
-                ))
-              )
+
+                  {event.location && (
+                    <div className="flex items-center gap-2 text-sm font-medium text-black mb-1">
+                      <i className="ri-map-pin-line"></i>
+                      <span>{event.location}</span>
+                    </div>
+                  )}
+
+                  {event.description && (
+                    <p className="text-sm font-medium text-black">
+                      {event.description}
+                    </p>
+                  )}
+                </div>
+              ))
             )}
           </div>
         </div>
@@ -879,8 +1060,8 @@ export default function CalendarScreen() {
       )}
 
       {showReservationModal && (
-        <div 
-          className="fixed inset-0 z-40" 
+        <div
+          className="fixed inset-0 z-40"
           onClick={() => setShowReservationModal(false)}
         ></div>
       )}
