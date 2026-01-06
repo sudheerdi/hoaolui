@@ -458,6 +458,22 @@ export default function UnitsScreen() {
     }
   };
 
+  const handleDownloadSampleCSV = () => {
+    const csvContent =
+      "First Name,Last Name,Email ID,Mobile Number,Address 1,Address 2,City,State,Country,Zipcode\nJohn,Smith,john.smith@email.com,+1 (555) 123-4567,55 forest way,,Greensboro,NC,USA,27409\nMaria,Garcia,maria.garcia@email.com,+1 (555) 234-5678,42 maple street,Apt 5B,Greensboro,NC,USA,27408";
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", "sample_units_template.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleBulkUploadSubmit = async () => {
     if (csvFile) {
       console.log("Uploading CSV file:", csvFile.name);
@@ -908,6 +924,15 @@ export default function UnitsScreen() {
                                 </label>
                               </div>
                             </div>
+
+                            <button
+                              onClick={handleDownloadSampleCSV}
+                              className="w-full py-2 border-2 border-[#1FA372] text-[#1FA372] rounded-lg font-semibold hover:bg-[#1FA372] hover:text-white transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center space-x-2"
+                            >
+                              <i className="ri-download-line text-lg"></i>
+                              <span>Sample CSV File</span>
+                            </button>
+
                             <button
                               onClick={handleBulkUploadSubmit}
                               disabled={!csvFile}
