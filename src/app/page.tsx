@@ -6,13 +6,13 @@ import FeaturesSection from "../components/home/FeaturesSection";
 import WhyChooseSection from "../components/home/WhyChooseSection";
 import TestimonialsSection from "../components/home/TestimonialsSection";
 import { useRouter } from "next/navigation";
+import PortalLayout from "../components/layout/PortalLayout";
 
 export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
+    <PortalLayout>
       <HeroSection />
       <FeaturesSection />
       <WhyChooseSection />
@@ -36,8 +36,6 @@ export default function Home() {
           </button>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PortalLayout>
   );
 }

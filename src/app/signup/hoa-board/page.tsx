@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "../../../components/feature/Navbar";
 import Footer from "../../../components/feature/Footer";
 import Button from "../../../components/base/Button";
 import Notification from "../../../components/base/Notification";
 
 export default function HOABoardSignup() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     communityName: "",
     email: "",
@@ -160,10 +162,7 @@ export default function HOABoardSignup() {
                   <strong>{formData.email}</strong>
                 </p>
               </div>
-              <Button
-                onClick={() => window.REACT_APP_NAVIGATE("/login")}
-                className="mx-auto"
-              >
+              <Button onClick={() => router.push("/login")} className="mx-auto">
                 Go to Login
               </Button>
             </div>

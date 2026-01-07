@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -8,30 +8,52 @@ interface ShareModalProps {
   documentName: string;
 }
 
-export default function ShareModal({ isOpen, onClose, documentName }: ShareModalProps) {
+export default function ShareModal({
+  isOpen,
+  onClose,
+  documentName,
+}: ShareModalProps) {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [shareLink, setShareLink] = useState('');
+  const [shareLink, setShareLink] = useState("");
 
   if (!isOpen) return null;
 
   const users = [
-    { id: '1', name: 'Sarah Johnson', email: 'sarah.j@email.com', avatar: 'SJ' },
-    { id: '2', name: 'Michael Chen', email: 'michael.c@email.com', avatar: 'MC' },
-    { id: '3', name: 'Emily Davis', email: 'emily.d@email.com', avatar: 'ED' },
-    { id: '4', name: 'Robert Wilson', email: 'robert.w@email.com', avatar: 'RW' },
-    { id: '5', name: 'Lisa Anderson', email: 'lisa.a@email.com', avatar: 'LA' },
+    {
+      id: "1",
+      name: "Sarah Johnson",
+      email: "sarah.j@email.com",
+      avatar: "SJ",
+    },
+    {
+      id: "2",
+      name: "Michael Chen",
+      email: "michael.c@email.com",
+      avatar: "MC",
+    },
+    { id: "3", name: "Emily Davis", email: "emily.d@email.com", avatar: "ED" },
+    {
+      id: "4",
+      name: "Robert Wilson",
+      email: "robert.w@email.com",
+      avatar: "RW",
+    },
+    { id: "5", name: "Lisa Anderson", email: "lisa.a@email.com", avatar: "LA" },
   ];
 
   const toggleUser = (userId: string) => {
-    setSelectedUsers(prev =>
+    setSelectedUsers((prev) =>
       prev.includes(userId)
-        ? prev.filter(id => id !== userId)
+        ? prev.filter((id) => id !== userId)
         : [...prev, userId]
     );
   };
 
   const generateShareLink = () => {
-    setShareLink('https://communityconnect.com/share/doc-' + Math.random().toString(36).substr(2, 9));
+    setShareLink(
+      "https://communityconnect.com/share/doc-" +
+        Math.random().toString(36).substr(2, 9)
+    );
   };
 
   const copyToClipboard = () => {
@@ -54,27 +76,33 @@ export default function ShareModal({ isOpen, onClose, documentName }: ShareModal
         <div className="p-6">
           <div className="mb-6">
             <p className="text-sm text-gray-600 mb-1">Document:</p>
-            <p className="text-base font-semibold text-gray-900">{documentName}</p>
+            <p className="text-base font-semibold text-gray-900">
+              {documentName}
+            </p>
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Share with Users</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">
+              Share with Users
+            </h3>
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {users.map(user => (
+              {users.map((user) => (
                 <div
                   key={user.id}
                   onClick={() => toggleUser(user.id)}
                   className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
                     selectedUsers.includes(user.id)
-                      ? 'border-teal-500 bg-teal-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? "border-teal-500 bg-teal-50"
+                      : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
                   <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                     {user.avatar}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {user.name}
+                    </p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                   </div>
                   {selectedUsers.includes(user.id) && (
@@ -86,7 +114,9 @@ export default function ShareModal({ isOpen, onClose, documentName }: ShareModal
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Or Generate Share Link</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">
+              Or Generate Share Link
+            </h3>
             {!shareLink ? (
               <button
                 onClick={generateShareLink}

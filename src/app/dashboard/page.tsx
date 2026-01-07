@@ -15,9 +15,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useState } from "react";
-import { useAppSelector } from "@/src/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/src/lib/hooks";
 import SendViolationModal from "@/src/components/modals/SendViolationModal";
 import { useUserAuthToken } from "@/src/helpers/hooks/useUserAuthToken";
+import Notification from "@/src/components/base/Notification";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 const revenueData = [
   { month: "Jan", revenue: 45000 },
@@ -36,10 +38,14 @@ const revenueData = [
 
 export default function Dashboard() {
   const isAuthenticated = useUserAuthToken();
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.hoaUser);
+  const { type, message } = useAppSelector((state) => state.hoaNotification);
   const [showSendViolationModal, setShowSendViolationModal] = useState(false);
   const [showMakePaymentModal, setShowMakePaymentModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [userRole, setUserRole] = useState<"admin" | "homeowner">("admin");
+  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
 
   const upcomingEvents = [
     { id: 1, title: "Board Meeting", date: "2024-02-15", time: "7:00 PM" },
@@ -63,6 +69,14 @@ export default function Dashboard() {
       <div className="hidden lg:block">
         <Sidebar />
       </div>
+
+      {type && (
+        <Notification
+          type={type}
+          message={message}
+          onClose={() => dispatch(setNotification({ type: null, message: "" }))}
+        />
+      )}
 
       {showMobileMenu && (
         <div
@@ -135,6 +149,98 @@ export default function Dashboard() {
               </div>
 
               <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <button
+                    onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+                    className="flex items-center space-x-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <div className="w-5 h-5 flex items-center justify-center">
+                      <i
+                        className={`${
+                          userRole === "admin"
+                            ? "ri-shield-user-line"
+                            : "ri-home-4-line"
+                        } text-gray-700`}
+                      ></i>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                      {userRole === "admin" ? "HOA Board" : "Homeowner"}
+                    </span>
+                    <div className="w-4 h-4 flex items-center justify-center">
+                      <i
+                        className={`ri-arrow-${
+                          showRoleSwitcher ? "up" : "down"
+                        }-s-line text-gray-600`}
+                      ></i>
+                    </div>
+                  </button>
+
+                  {showRoleSwitcher && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowRoleSwitcher(false)}
+                      ></div>
+
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                        <button
+                          onClick={() => {
+                            setUserRole("admin");
+                            setShowRoleSwitcher(false);
+                          }}
+                          className={`w-full flex items-center space-x-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${
+                            userRole === "admin" ? "bg-green-50" : ""
+                          }`}
+                        >
+                          <div className="w-5 h-5 flex items-center justify-center">
+                            <i className="ri-shield-user-line text-gray-700"></i>
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="font-medium text-gray-900">
+                              HOA Board Member
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Full admin access
+                            </div>
+                          </div>
+                          {userRole === "admin" && (
+                            <div className="w-5 h-5 flex items-center justify-center">
+                              <i className="ri-check-line text-[#1FA372]"></i>
+                            </div>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setUserRole("homeowner");
+                            setShowRoleSwitcher(false);
+                          }}
+                          className={`w-full flex items-center space-x-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${
+                            userRole === "homeowner" ? "bg-green-50" : ""
+                          }`}
+                        >
+                          <div className="w-5 h-5 flex items-center justify-center">
+                            <i className="ri-home-4-line text-gray-700"></i>
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="font-medium text-gray-900">
+                              Homeowner
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Resident view
+                            </div>
+                          </div>
+                          {userRole === "homeowner" && (
+                            <div className="w-5 h-5 flex items-center justify-center">
+                              <i className="ri-check-line text-[#1FA372]"></i>
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+
                 <button
                   onClick={() => setShowMakePaymentModal(true)}
                   className="hidden lg:block px-4 py-2 bg-[#1FA372] text-white text-sm font-medium rounded-lg hover:bg-[#188f5f] transition-colors cursor-pointer whitespace-nowrap"

@@ -8,6 +8,8 @@ import {
 } from "@/src/services";
 import { violationIcons } from "@/src/helpers";
 import ViolationPDFPreviewModal from "./ViolationPDFPreviewModal";
+import { useAppDispatch, useAppSelector } from "@/src/lib/hooks";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 interface SendViolationModalProps {
   isOpen: boolean;
@@ -18,6 +20,8 @@ export default function SendViolationModal({
   isOpen,
   onClose,
 }: SendViolationModalProps) {
+  const dispatch = useAppDispatch();
+  const { user: hoaUser } = useAppSelector((state) => state.hoaUser);
   const [
     getViolationDefaults,
     { data: defaultViolationsData, isLoading: isLoadingViolationsDefaults },
@@ -29,191 +33,75 @@ export default function SendViolationModal({
   const [selectedViolation, setSelectedViolation] =
     useState<ViolationType | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("open");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [showSendViolationModal, setShowSendViolationModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
-  const [selectedViolationType, setSelectedViolationType] = useState("");
   const [violationContent, setViolationContent] = useState("");
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
-  const [evidenceDescription, setEvidenceDescription] = useState("");
   const [showPDFPreview, setShowPDFPreview] = useState(false);
-  const [violationDescription, setViolationDescription] = useState("");
-  const [ccrsSection, setCcrsSection] = useState("");
   const [timeObserved, setTimeObserved] = useState("");
-  const [reportedBy, setReportedBy] = useState("");
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [customDescription, setCustomDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [grassDescription, setGrassDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [guestDescription, setGuestDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [parkingDescription, setParkingDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [noiseDescription, setNoiseDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [petDescription, setPetDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [smokingDescription, setSmokingDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [poolDescription, setPoolDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
-  const [trashDescription, setTrashDescription] = useState(
+  const [description, setDescription] = useState(
     "Date Observed: mm/dd/yyyy\nDescription: "
   );
   const [vehicleDescription, setVehicleDescription] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
   const [dateObserved, setDateObserved] = useState("");
 
-  const [dynamicFields, setDynamicFields] = useState<any[]>([]);
-
-  const [notification, setNotification] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
-  const [requestData, setRequestData] = useState<ViolationRequestType>({
-    userId: usersData ? usersData.results[0]?.userId : "",
-    firstName: usersData ? usersData.results[0]?.firstName : "",
-    lastName: usersData ? usersData.results[0]?.lastName : "",
-    emailId: usersData ? usersData.results[0]?.emailId : "",
-    mobileNumber: usersData ? usersData.results[0]?.mobileNumber : "",
-    unitId: usersData ? usersData.results[0]?.unitId : "",
-    address1: usersData ? usersData.results[0]?.address1 : "",
-    address2: usersData ? usersData.results[0]?.address2 : "",
-    city: usersData ? usersData.results[0]?.city : "",
-    state: usersData ? usersData.results[0]?.state : "",
-    zipCode: usersData ? usersData.results[0]?.zipCode : "",
-    country: usersData ? usersData.results[0]?.country : "",
-    membershipId: usersData ? usersData.results[0]?.membershipId : "",
-    type: selectedViolationType,
-    violationDate: "",
-    description: "",
-    violationPicture: "",
-    dynamicValues: dynamicFields.reduce((acc, field) => {
-      acc[field.name] = field.value;
-      return acc;
-    }, {}),
-  });
   const handleUserSelect = (user: UserType) => {
     setSelectedUser(user);
     setUserSearchTerm(`${user.firstName} ${user.lastName} - ${user.address1}`);
     setShowUserDropdown(false);
   };
 
-  const handleViolationTypeChange = (typeId: string) => {
-    setSelectedViolationType(typeId);
-    const selectedType = defaultViolationsData?.violationDefaults.find(
-      (type) => type.id === typeId
-    );
-
-    setSelectedViolation(selectedType || null);
-
-    if (selectedType) {
-      setViolationContent(selectedType.templateDescription);
-      if (selectedType.id === "1") {
-        setCustomDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "2") {
-        setGrassDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "3") {
-        setGuestDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "4") {
-        setParkingDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "5") {
-        setNoiseDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "6") {
-        setPetDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "7") {
-        setSmokingDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "8") {
-        setPoolDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      } else if (selectedType.id === "9") {
-        setTrashDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-      }
-    } else {
-      setViolationContent("");
-    }
-  };
-
-  const handleViolationTypeChanges = (typeId: string) => {
-    setSelectedViolationType(typeId);
-    const selectedType = defaultViolationsData?.violationDefaults.find(
-      (type) => type.id === typeId
-    );
-
-    const dynamicFields = selectedType?.typeSpecificConfig
-      .substring(
-        selectedType?.typeSpecificConfig.indexOf("[") + 1,
-        selectedType?.typeSpecificConfig.lastIndexOf("]")
-      )
-      .replaceAll(/"/g, "")
-      .split(",");
-
-    const fieldsArray =
-      dynamicFields?.map((field) => ({
-        name: field.trim(),
-        label: field.replace(/([A-Z])/g, " $1").trim(),
-        value: "",
-      })) || [];
-
-    setDynamicFields(fieldsArray);
-
-    if (selectedType) {
-      setViolationContent(selectedType.templateDescription);
-    } else {
-      setViolationContent("");
-    }
-  };
-
   const handleSendViolation = async () => {
-    if (!selectedUser || !selectedViolationType || !violationContent.trim()) {
-      alert("Please fill in all required fields");
+    if (!selectedUser || !selectedViolation) {
       return;
     }
 
-    const violationType = defaultViolationsData?.violationDefaults.find(
-      (vt) => vt.id === selectedViolationType
-    );
+    const requestData: ViolationRequestType = {
+      userId: selectedUser.userId,
+      firstName: selectedUser.firstName,
+      lastName: selectedUser.lastName,
+      emailId: selectedUser.emailId,
+      mobileNumber: selectedUser.mobileNumber,
+      unitId: selectedUser.unitId,
+      address1: selectedUser.address1,
+      address2: selectedUser.address2,
+      city: selectedUser.city,
+      state: selectedUser.state,
+      zipCode: selectedUser.zipCode,
+      country: selectedUser.country,
+      membershipId: selectedUser.membershipId,
+      type: selectedViolation?.violationType || "",
+      dynamicValues: {
+        date: dateObserved,
+        description: violationContent,
+        violationPicture:
+          uploadedImages.map((img) => URL.createObjectURL(img))[0] || "",
+        vehicleDescription: vehicleDescription,
+        licensePlate: licensePlate,
+      },
+    };
 
     try {
       await createViolation(requestData);
-    } catch (error) {
-      console.error("Error creating violation:", error);
-    }
-
-    if (selectedUser && violationType) {
-      alert(
-        `Violation notice sent to ${selectedUser.firstName} ${selectedUser.lastName} (${selectedUser.address1}) for ${violationType.violationType}`
+      dispatch(
+        setNotification({
+          type: "success",
+          message: `Violation notice sent to ${selectedUser.firstName} ${selectedUser.lastName} (${selectedUser.address1}) for ${selectedViolation?.violationType}`,
+        })
       );
-      onClose();
-      setSelectedUser(null);
-      setSelectedViolationType("");
-      setViolationContent("");
-      setUserSearchTerm("");
-    }
-  };
 
-  const handleDynamicFieldsChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, value } = e.target;
-    setDynamicFields((prevFields) =>
-      prevFields.map((field) =>
-        field.value === name ? { ...field, value } : field
-      )
-    );
+      handleResetForm();
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message: "Failed to create violation: Membership not found",
+        })
+      );
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -238,33 +126,7 @@ export default function SendViolationModal({
   };
 
   const getPDFFormData = () => {
-    const violationType = defaultViolationsData?.violationDefaults.find(
-      (vt) => vt.id === selectedViolationType
-    );
-
-    let description = "";
     let dateObs = "";
-
-    if (selectedViolationType === "1") {
-      description = customDescription;
-    } else if (selectedViolationType === "2") {
-      description = grassDescription;
-    } else if (selectedViolationType === "3") {
-      description = guestDescription;
-    } else if (selectedViolationType === "4") {
-      description = parkingDescription;
-    } else if (selectedViolationType === "5") {
-      description = noiseDescription;
-    } else if (selectedViolationType === "6") {
-      description = petDescription;
-    } else if (selectedViolationType === "7") {
-      description = smokingDescription;
-    } else if (selectedViolationType === "8") {
-      description = poolDescription;
-    } else if (selectedViolationType === "9") {
-      description = trashDescription;
-    }
-
     const dateMatch = description.match(
       /Date Observed:\s*(\d{2}\/\d{2}\/\d{4})/
     );
@@ -276,34 +138,20 @@ export default function SendViolationModal({
     const descText = descMatch ? descMatch[1].trim() : "";
 
     return {
-      communityName: selectedUser?.unitId || "",
+      communityName: hoaUser.memberships[0]?.communityName || "",
       date: new Date().toLocaleDateString(),
-      propertyAddress: selectedUser?.address1 || "",
+      propertyAddress:
+        selectedUser?.address1 + " " + selectedUser?.address2 || "",
       homeownerName:
         selectedUser?.firstName + " " + selectedUser?.lastName || "",
       violationType: selectedViolation?.violationType || "",
       description: descText,
-      ccrsSection: ccrsSection,
+      ccrsSection: "",
       dateObserved: dateObs,
       timeObserved: timeObserved,
-      reportedBy: reportedBy,
-      evidence: evidenceDescription,
+      reportedBy: "",
+      evidence: uploadedImages,
     };
-  };
-
-  const getViolationTypeDisplay = (typeId: string) => {
-    const typeDisplayMap: { [key: string]: string } = {
-      "1": "Other",
-      "2": "Overgrown / Unmowed grass",
-      "3": "Guest policy violation",
-      "4": "Illegal Parking / Driveway Obstruction",
-      "5": "Excessive noise / disturbance",
-      "6": "Pet policy violation",
-      "7": "Smoking in prohibited areas",
-      "8": "Swimming Pool Policy Infraction",
-      "9": "Trash / Waste Disposal Issue",
-    };
-    return typeDisplayMap[typeId] || "";
   };
 
   const handleGetViolationDefaults = async () => {
@@ -321,15 +169,30 @@ export default function SendViolationModal({
     await getUsers(searchTerm);
   };
 
+  const handleResetForm = () => {
+    onClose();
+    setSelectedUser(null);
+    setSelectedViolation(null);
+    setViolationContent("");
+    setUserSearchTerm("");
+    setShowUserDropdown(false);
+    setUploadedImages([]);
+    setTimeObserved("");
+    setDescription("Date Observed: mm/dd/yyyy\nDescription: ");
+    setDateObserved("");
+    setVehicleDescription("");
+    setLicensePlate("");
+  };
+
   useEffect(() => {
     if (isOpen) handleGetViolationDefaults();
   }, [isOpen]);
 
   useEffect(() => {
-    if (userSearchTerm && userSearchTerm.length > 2) {
-      handleGetUsers(userSearchTerm);
+    if (searchTerm && searchTerm.length > 2) {
+      handleGetUsers(searchTerm);
     }
-  }, [userSearchTerm]);
+  }, [searchTerm]);
 
   if (!isOpen) return null;
 
@@ -342,18 +205,7 @@ export default function SendViolationModal({
               Send Violation Notice
             </h3>
             <button
-              onClick={() => {
-                onClose();
-                setSelectedUser(null);
-                setSelectedViolationType("");
-                setViolationContent("");
-                setUserSearchTerm("");
-                setShowUserDropdown(false);
-                setUploadedImages([]);
-                setEvidenceDescription("");
-                setTimeObserved("");
-                setReportedBy("");
-              }}
+              onClick={() => handleResetForm()}
               className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >
               <i className="ri-close-line text-lg"></i>
@@ -371,6 +223,7 @@ export default function SendViolationModal({
                     type="text"
                     value={userSearchTerm}
                     onChange={(e) => {
+                      setSearchTerm(e.target.value);
                       setUserSearchTerm(e.target.value);
                       setShowUserDropdown(true);
                       if (!e.target.value) {
@@ -414,12 +267,12 @@ export default function SendViolationModal({
                     defaultViolationsData.violationDefaults.map((violation) => (
                       <button
                         key={violation.id}
-                        onClick={() => handleViolationTypeChange(violation.id)}
+                        onClick={() => setSelectedViolation(violation)}
                         disabled={!selectedUser}
                         className={`p-2 rounded-lg border-2 transition-all text-left flex flex-col items-center justify-center space-y-1 cursor-pointer ${
                           !selectedUser
                             ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
-                            : selectedViolationType === violation.id
+                            : selectedViolation?.violationType === violation.id
                             ? "border-[#1FA372] bg-[#1FA372]/10"
                             : "border-gray-200 bg-white hover:border-[#1FA372] hover:bg-gray-50"
                         }`}
@@ -461,8 +314,8 @@ export default function SendViolationModal({
 
                   <div>
                     <textarea
-                      value={customDescription}
-                      onChange={(e) => setCustomDescription(e.target.value)}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1FA372] resize-none"
                       style={{ height: "400px" }}
                     />

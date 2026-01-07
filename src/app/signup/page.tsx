@@ -8,9 +8,13 @@ import Notification from "../../components/base/Notification";
 import { useRouter } from "next/navigation";
 import { useSetHoaUserRegisterMutation } from "../../services";
 import Loader from "@/src/components/base/Loader";
+import { useAppDispatch } from "@/src/lib/hooks";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
+import PortalLayout from "@/src/components/layout/PortalLayout";
 
 export default function HOABoardSignup() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [setHoaUserRegister, { isLoading, isSuccess }] =
     useSetHoaUserRegisterMutation();
   const [formData, setFormData] = useState({
@@ -30,10 +34,6 @@ export default function HOABoardSignup() {
     captchaVerified: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [notification, setNotification] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -98,10 +98,12 @@ export default function HOABoardSignup() {
 
     // CAPTCHA validation
     if (!formData.captchaVerified) {
-      setNotification({
-        type: "error",
-        message: "Please verify that you are not a robot.",
-      });
+      dispatch(
+        setNotification({
+          type: "error",
+          message: "Please verify that you are not a robot.",
+        })
+      );
       return false;
     }
 
@@ -111,12 +113,13 @@ export default function HOABoardSignup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) {
-      setNotification({
-        type: "error",
-        message: "Please fix all errors before submitting.",
-      });
+      dispatch(
+        setNotification({
+          type: "error",
+          message: "Please fix all errors before submitting.",
+        })
+      );
       return;
     }
 
@@ -142,19 +145,9 @@ export default function HOABoardSignup() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {isLoading && <Loader />}
-      <Navbar />
-
-      {notification && (
-        <Notification
-          type={notification.type}
-          message={notification.message}
-          onClose={() => setNotification(null)}
-        />
-      )}
-
+    <PortalLayout>
       <main className="flex-grow bg-gradient-to-br from-gray-100 to-gray-50 py-6">
+        {isLoading && <Loader />}
         {isSuccess ? (
           <div className="max-w-2xl mx-auto px-4 w-full">
             <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
@@ -783,7 +776,9 @@ export default function HOABoardSignup() {
                   </label>
                 </div>
 
-                <Button className="w-full">Create an Account</Button>
+                <Button type="submit" className="w-full">
+                  Create an Account
+                </Button>
 
                 <p className="text-center text-sm text-gray-600 mt-3">
                   Already have an account?{" "}
@@ -800,8 +795,6 @@ export default function HOABoardSignup() {
           </div>
         )}
       </main>
-
-      <Footer />
-    </div>
+    </PortalLayout>
   );
 }

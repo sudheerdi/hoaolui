@@ -1,4 +1,5 @@
 import hoaUserReducer from "./hoa-user.reducer";
+import hoaNotificationReducer from "./hoa-notificatio.reducer";
 import {
   hoaUserRegisterApi,
   hoaUserLoginApi,
@@ -9,6 +10,7 @@ import {
 
 const reducer = {
   hoaUser: hoaUserReducer,
+  hoaNotification: hoaNotificationReducer,
   [hoaUserRegisterApi.reducerPath]: hoaUserRegisterApi.reducer,
   [hoaUserLoginApi.reducerPath]: hoaUserLoginApi.reducer,
   [hoaUnitsBulkUploadApi.reducerPath]: hoaUnitsBulkUploadApi.reducer,

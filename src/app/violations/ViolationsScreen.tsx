@@ -5,6 +5,9 @@ import Sidebar from "../../components/Sidebar";
 import ViolationDetails from "./ViolationDetails";
 import { useLazyGetUsersQuery } from "../../services";
 import SendViolationModal from "../../components/modals/SendViolationModal";
+import { useAppDispatch, useAppSelector } from "@/src/lib/hooks";
+import Notification from "@/src/components/base/Notification";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 interface Violation {
   id: string;
@@ -42,6 +45,8 @@ interface ViolationType {
 
 export default function ViolationsScreen() {
   const [getUsers] = useLazyGetUsersQuery();
+  const dispatch = useAppDispatch();
+  const { type, message } = useAppSelector((state) => state.hoaNotification);
   const [selectedViolation, setSelectedViolation] = useState<Violation | null>(
     null
   );
@@ -498,6 +503,14 @@ export default function ViolationsScreen() {
   return (
     <div className="min-h-screen bg-[#1E293B] p-[10px]">
       <Sidebar />
+
+      {type && (
+        <Notification
+          type={type}
+          message={message}
+          onClose={() => dispatch(setNotification({ type: null, message: "" }))}
+        />
+      )}
 
       <div className="lg:ml-[260px] bg-white rounded-lg min-h-[calc(100vh-20px)] flex flex-col">
         {/* Top Bar */}

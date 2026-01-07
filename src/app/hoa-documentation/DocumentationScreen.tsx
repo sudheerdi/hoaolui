@@ -632,7 +632,7 @@ export default function DocumentationScreen() {
                     className={`px-3 py-2 rounded-lg text-base font-semibold transition-colors whitespace-nowrap ${
                       selectedFolder === "all"
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
+                        : "bg-[#1FA372] text-white hover:bg-[#188f5f] transition-colors cursor-pointer"
                     }`}
                   >
                     <i className="ri-upload-line mr-2"></i>
@@ -1042,7 +1042,7 @@ export default function DocumentationScreen() {
                   </button>
                   <button
                     onClick={() => handleShareSettingsChange("specific")}
-                    className="flex-1 px-3 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 text-base whitespace-nowrap"
+                    className="flex-1 px-3 py-2 bg-[#1FA372] text-white font-semibold rounded-lg hover:bg-[#188f5f] transition-colors text-base whitespace-nowrap"
                   >
                     Share
                   </button>

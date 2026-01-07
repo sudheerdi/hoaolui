@@ -15,7 +15,7 @@ interface ViolationPDFPreviewModalProps {
     dateObserved: string;
     timeObserved: string;
     reportedBy: string;
-    evidence: string;
+    evidence: File[];
   };
 }
 
@@ -159,7 +159,9 @@ export default function ViolationPDFPreviewModal({
                     - Photographic / Witness Evidence (if applicable):
                   </span>
                   <span className="text-gray-900 flex-1">
-                    [Attach or insert details here]
+                    {formData.evidence.map((file, index) => (
+                      <span key={index}>{file.name}</span>
+                    )) || "_____________________"}
                   </span>
                 </div>
               </div>

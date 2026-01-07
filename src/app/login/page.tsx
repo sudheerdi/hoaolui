@@ -1,15 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "../../components/feature/Navbar";
-import Footer from "../../components/feature/Footer";
 import Button from "../../components/base/Button";
-import Notification from "../../components/base/Notification";
 import { useHoaUserLoginMutation } from "../../services";
 import { useAppDispatch } from "@/src/lib/hooks";
 import { setUserProfile } from "@/src/reducer/hoa-user.reducer";
 import { useRouter } from "next/navigation";
 import Loader from "@/src/components/base/Loader";
+import PortalLayout from "@/src/components/layout/PortalLayout";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 export default function Login() {
   const router = useRouter();
@@ -18,10 +17,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [notification, setNotification] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
 
   const [hoaUserLogin, { isLoading }] = useHoaUserLoginMutation();
 
@@ -30,19 +25,23 @@ export default function Login() {
 
     // Simulate validation
     if (!email || !password) {
-      setNotification({
-        type: "error",
-        message: "Please fill in all required fields.",
-      });
+      dispatch(
+        setNotification({
+          type: "error",
+          message: "Please fill in all required fields.",
+        })
+      );
       return;
     }
 
     // Simulate login validation
     if (password.length < 6) {
-      setNotification({
-        type: "error",
-        message: "Invalid email or password. Please try again.",
-      });
+      dispatch(
+        setNotification({
+          type: "error",
+          message: "Invalid email or password. Please try again.",
+        })
+      );
       return;
     }
 
@@ -51,27 +50,19 @@ export default function Login() {
       dispatch(setUserProfile(result));
       router.push("/dashboard");
     } catch (error: any) {
-      setNotification({
-        type: "error",
-        message: error ? error?.data.error : "An unknown error occurred.",
-      });
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error ? error?.data.error : "An unknown error occurred.",
+        })
+      );
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {isLoading && <Loader />}
-      <Navbar />
-
-      {notification && (
-        <Notification
-          type={notification.type}
-          message={notification.message}
-          onClose={() => setNotification(null)}
-        />
-      )}
-
+    <PortalLayout>
       <main className="flex-grow bg-gradient-to-br from-gray-100 to-gray-50 py-16">
+        {isLoading && <Loader />}
         <div className="max-w-xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl p-10">
             {/* Header */}
@@ -283,8 +274,6 @@ export default function Login() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </div>
+    </PortalLayout>
   );
 }

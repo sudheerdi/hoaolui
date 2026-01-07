@@ -26,10 +26,13 @@ type ViolationRequestType = {
   country: string;
   membershipId: string;
   type: string;
-  violationDate: string;
-  description: string;
-  violationPicture: string;
-  dynamicValues: any;
+  dynamicValues: {
+    date: string;
+    description: string;
+    violationPicture: string;
+    vehicleDescription: string;
+    licensePlate: string;
+  };
 };
 
 type ViolationResponseType = {
