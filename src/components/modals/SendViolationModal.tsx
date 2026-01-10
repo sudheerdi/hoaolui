@@ -249,7 +249,7 @@ export default function SendViolationModal({
                               {user.firstName} {user.lastName}
                             </div>
                             <div className="text-sm text-gray-600">
-                              {user.address1} • {user.emailId}
+                              {user.address1} {user.address2}• {user.emailId}
                             </div>
                           </button>
                         ))}

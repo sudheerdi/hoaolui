@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import Sidebar from "../../components/Sidebar";
-import { useSetUnitsBulkUploadMutation } from "@/src/services";
-import Notification from "../../components/base/Notification";
+import { useEffect, useState } from "react";
+import {
+  useLazyGetUnitsQuery,
+  useSetUnitsBulkUploadMutation,
+} from "@/src/services";
+import DashboardLayout from "@/src/components/layout/DashboardLayout";
+import { useAppDispatch } from "@/src/lib/hooks";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 interface Unit {
   id: string;
@@ -20,11 +24,10 @@ interface Document {
 }
 
 export default function UnitsScreen() {
+  const dispatch = useAppDispatch();
+  const [getUnits, { data: unitsData, isLoading: unitsLoading }] =
+    useLazyGetUnitsQuery();
   const [setUnitsBulkUpload] = useSetUnitsBulkUploadMutation();
-  const [notification, setNotification] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [occupancyFilter, setOccupancyFilter] = useState<"owner" | "tenant">(
     "owner"
@@ -43,6 +46,7 @@ export default function UnitsScreen() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [ownerSearchTerm, setOwnerSearchTerm] = useState("");
   const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
+  const [filteredUnits, setFilteredUnits] = useState([]);
 
   const [individualUnitData, setIndividualUnitData] = useState({
     firstName: "",
@@ -393,14 +397,6 @@ export default function UnitsScreen() {
     },
   ];
 
-  const filteredUnits = mockUnits.filter((unit) => {
-    const matchesSearch =
-      unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      unit.address.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = unit.type === occupancyFilter;
-    return matchesSearch && matchesType;
-  });
-
   const filteredOwners = mockOwners.filter((owner) =>
     owner.name.toLowerCase().includes(ownerSearchTerm.toLowerCase())
   );
@@ -488,13 +484,21 @@ export default function UnitsScreen() {
     try {
       const response = await setUnitsBulkUpload(formData);
       console.log("Bulk upload response:", response);
+      dispatch(
+        setNotification({
+          type: "success",
+          message: "Units uploaded successfully.",
+        })
+      );
     } catch (error: any) {
-      setNotification({
-        type: "error",
-        message: error
-          ? error.data.error
-          : "An unknown error occurred during bulk upload.",
-      });
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error
+            ? error.data.error
+            : "An unknown error occurred during bulk upload.",
+        })
+      );
     }
   };
 
@@ -558,18 +562,49 @@ export default function UnitsScreen() {
     return firstName.trim() && lastName.trim() && email.trim() && mobile.trim();
   };
 
+  const handleGetUnits = async () => {
+    try {
+      await getUnits(null);
+    } catch (error: any) {
+      console.error("Error fetching units:", error);
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error
+            ? error?.data.error
+            : "An unknown error occurred during bulk upload.",
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    handleGetUnits();
+  }, [getUnits]);
+
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredUnits(unitsData?.units);
+      return;
+    }
+    const units: any = unitsData?.units.filter((unit: any) => {
+      const matchesSearch =
+        unit.owners[0].firstName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        unit.owners[0].lastName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        unit.address1.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        unit.address2.toLowerCase().includes(searchTerm.toLowerCase());
+      //const matchesType = unit.type === occupancyFilter;
+      return matchesSearch;
+    });
+    setFilteredUnits(units);
+  }, [searchTerm, unitsData]);
+
   return (
-    <div className="min-h-screen bg-[#1E293B] overflow-hidden">
-      <Sidebar />
-
-      {notification && (
-        <Notification
-          type={notification.type}
-          message={notification.message}
-          onClose={() => setNotification(null)}
-        />
-      )}
-
+    <DashboardLayout>
       <div className="lg:ml-[260px] p-[10px] h-screen flex flex-col">
         <div className="bg-white rounded-lg shadow-sm flex flex-col h-full overflow-hidden">
           <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
@@ -581,7 +616,7 @@ export default function UnitsScreen() {
                       Units :
                     </span>
                     <span className="text-lg font-semibold text-gray-900">
-                      345
+                      {unitsData?.totalUnits}
                     </span>
                   </div>
 
@@ -1190,9 +1225,9 @@ export default function UnitsScreen() {
 
           <div className="flex-1 overflow-y-auto p-4 bg-[#F9FAFB]">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-              {filteredUnits.map((unit) => (
+              {filteredUnits?.map((unit: any) => (
                 <div
-                  key={unit.id}
+                  key={unit.unitId}
                   className={`w-full ${
                     unit.type === "tenant" ? "h-[88px]" : "h-[68px]"
                   } bg-white rounded-lg border border-gray-200 p-3 hover:shadow-md transition-shadow cursor-pointer`}
@@ -1200,21 +1235,21 @@ export default function UnitsScreen() {
                   <div className="flex items-start space-x-2">
                     <div
                       className={`w-6 h-6 ${getRandomColor(
-                        unit.name
+                        unit.owners[0].firstName
                       )} rounded text-white text-xs font-medium flex items-center justify-center flex-shrink-0`}
                     >
-                      {getInitials(unit.name)}
+                      {unit.owners[0].firstName[0]}
+                      {unit.owners[0].lastName[0]}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-black truncate">
-                        {unit.name}
+                        {unit.owners[0].firstName} {unit.owners[0].lastName}
                       </p>
-                      <div className="text-xs font-medium text-black leading-tight">
-                        {unit.address.split("\n").map((line, index) => (
-                          <div key={index} className="truncate">
-                            {line}
-                          </div>
-                        ))}
+                      <div className="text-xs font-medium text-black leading-tight truncate">
+                        {unit.address1}
+                      </div>
+                      <div className="text-xs font-medium text-black leading-tight truncate">
+                        {unit.address2}
                       </div>
                       {unit.type === "tenant" && (
                         <button
@@ -1355,6 +1390,6 @@ export default function UnitsScreen() {
           </div>
         </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 }

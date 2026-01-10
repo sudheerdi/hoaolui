@@ -6,6 +6,7 @@ import {
   hoaUnitsBulkUploadApi,
   hoaViolationsApi,
   hoaUserSearchApi,
+  hoaUnitsApi,
 } from "../services";
 
 const reducer = {
@@ -16,6 +17,7 @@ const reducer = {
   [hoaUnitsBulkUploadApi.reducerPath]: hoaUnitsBulkUploadApi.reducer,
   [hoaViolationsApi.reducerPath]: hoaViolationsApi.reducer,
   [hoaUserSearchApi.reducerPath]: hoaUserSearchApi.reducer,
+  [hoaUnitsApi.reducerPath]: hoaUnitsApi.reducer,
 };
 
 export default reducer;
