@@ -3,7 +3,6 @@ import reducer from "../reducer";
 import {
   hoaUserRegisterApi,
   hoaUserLoginApi,
-  hoaUnitsBulkUploadApi,
   hoaViolationsApi,
   hoaUserSearchApi,
   hoaUnitsApi,
@@ -18,7 +17,6 @@ export const makeStore = () => {
       }).concat(
         hoaUserRegisterApi.middleware,
         hoaUserLoginApi.middleware,
-        hoaUnitsBulkUploadApi.middleware,
         hoaViolationsApi.middleware,
         hoaUserSearchApi.middleware,
         hoaUnitsApi.middleware

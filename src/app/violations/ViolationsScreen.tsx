@@ -1,383 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Sidebar from "../../components/Sidebar";
 import ViolationDetails from "./ViolationDetails";
-import { useLazyGetUsersQuery } from "../../services";
+import { useLazyGetViolationsQuery } from "../../services";
 import SendViolationModal from "../../components/modals/SendViolationModal";
-import { useAppDispatch, useAppSelector } from "@/src/lib/hooks";
-import Notification from "@/src/components/base/Notification";
+import { useAppDispatch } from "@/src/lib/hooks";
+import DashboardLayout from "@/src/components/layout/DashboardLayout";
 import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
-interface Violation {
-  id: string;
-  violationId: string;
-  memberName: string;
-  memberEmail: string;
-  memberUnit: string;
-  violationType: string;
-  description: string;
-  fullDescription: string;
-  severity: "low" | "medium" | "high";
-  status: "open" | "resolved" | "pending";
-  date: string;
-  reportedBy: string;
-  photos?: string[];
-  icon: string;
-  location: string;
-  resolutionNotes?: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  unit: string;
-}
-
-interface ViolationType {
-  id: string;
-  name: string;
-  defaultContent: string;
-  severity: "low" | "medium" | "high";
-  icon: string;
-}
-
 export default function ViolationsScreen() {
-  const [getUsers] = useLazyGetUsersQuery();
   const dispatch = useAppDispatch();
-  const { type, message } = useAppSelector((state) => state.hoaNotification);
+  const [getViolations, { data: violationsData }] = useLazyGetViolationsQuery();
   const [selectedViolation, setSelectedViolation] = useState<Violation | null>(
     null
   );
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("open");
+  const [statusFilter, setStatusFilter] = useState<string>("OPEN");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [showSendViolationModal, setShowSendViolationModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState("");
-  const [selectedViolationType, setSelectedViolationType] = useState("");
-  const [violationContent, setViolationContent] = useState("");
-  const [userSearchTerm, setUserSearchTerm] = useState("");
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
-
-  const mockUsers: User[] = [
-    {
-      id: "1",
-      name: "John Smith",
-      email: "john.smith@email.com",
-      unit: "Unit 4B",
-    },
-    {
-      id: "2",
-      name: "Maria Garcia",
-      email: "maria.garcia@email.com",
-      unit: "Unit 7C",
-    },
-    {
-      id: "3",
-      name: "Robert Johnson",
-      email: "robert.johnson@email.com",
-      unit: "Unit 2A",
-    },
-    {
-      id: "4",
-      name: "Lisa Chen",
-      email: "lisa.chen@email.com",
-      unit: "Unit 5D",
-    },
-    {
-      id: "5",
-      name: "David Wilson",
-      email: "david.wilson@email.com",
-      unit: "Unit 8A",
-    },
-    {
-      id: "6",
-      name: "Jennifer Lee",
-      email: "jennifer.lee@email.com",
-      unit: "Unit 3B",
-    },
-    {
-      id: "7",
-      name: "Michael Brown",
-      email: "michael.brown@email.com",
-      unit: "Unit 6C",
-    },
-    {
-      id: "8",
-      name: "Sarah Davis",
-      email: "sarah.davis@email.com",
-      unit: "Unit 1A",
-    },
-    {
-      id: "9",
-      name: "James Wilson",
-      email: "james.wilson@email.com",
-      unit: "Unit 9A",
-    },
-    {
-      id: "10",
-      name: "Emily Rodriguez",
-      email: "emily.rodriguez@email.com",
-      unit: "Unit 10B",
-    },
-  ];
-
-  const violationTypes: ViolationType[] = [
-    {
-      id: "1",
-      name: "Parking Violation",
-      defaultContent:
-        "Your vehicle has been found in violation of the community parking regulations. Please ensure your vehicle is parked only in designated areas and follows all posted parking guidelines. Continued violations may result in towing at owner's expense.",
-      severity: "medium",
-      icon: "🚗",
-    },
-    {
-      id: "2",
-      name: "Noise Violation",
-      defaultContent:
-        "We have received complaints regarding excessive noise from your unit during quiet hours (10 PM - 7 AM). Please be mindful of noise levels to maintain a peaceful environment for all residents. This includes music, television, conversations, and other activities.",
-      severity: "medium",
-      icon: "🔊",
-    },
-    {
-      id: "3",
-      name: "Pet Violation",
-      defaultContent:
-        "Your pet has been observed violating community pet policies. All pets must be leashed in common areas, and owners are responsible for cleaning up after their pets. Please review the pet policy in your lease agreement.",
-      severity: "high",
-      icon: "🐕",
-    },
-    {
-      id: "4",
-      name: "Trash Violation",
-      defaultContent:
-        "Improper waste disposal has been observed. Please ensure all trash is placed in designated containers and areas only on collection days. Do not leave trash bags outside designated areas as this attracts pests and creates unsanitary conditions.",
-      severity: "low",
-      icon: "🗑️",
-    },
-    {
-      id: "5",
-      name: "Smoking Violation",
-      defaultContent:
-        "Smoking has been observed in non-smoking areas of the community. Please note that smoking is prohibited in all indoor common areas, elevators, and designated non-smoking zones. Please use designated smoking areas only.",
-      severity: "medium",
-      icon: "🚭",
-    },
-    {
-      id: "6",
-      name: "Pool Violation",
-      defaultContent:
-        "Pool facility rules have been violated. Please observe posted pool hours, guest policies, and safety regulations. Children must be supervised at all times. No glass containers, loud music, or inappropriate behavior is permitted in the pool area.",
-      severity: "medium",
-      icon: "🏊",
-    },
-    {
-      id: "7",
-      name: "Balcony Violation",
-      defaultContent:
-        "Unauthorized modifications or items have been observed on your balcony. All balcony modifications must be pre-approved by the HOA. Please remove any unauthorized items and submit proper requests for any desired changes.",
-      severity: "low",
-      icon: "🏠",
-    },
-    {
-      id: "8",
-      name: "Guest Violation",
-      defaultContent:
-        "Guest policy violations have been observed. All overnight guests must be registered with management for stays longer than 3 consecutive days. Please ensure your guests follow all community rules and regulations during their visit.",
-      severity: "medium",
-      icon: "👥",
-    },
-    {
-      id: "9",
-      name: "Other Violations",
-      defaultContent:
-        "A violation of community rules and regulations has been observed. Please review your lease agreement and community guidelines to ensure compliance with all policies. Contact the management office if you have any questions about community rules.",
-      severity: "medium",
-      icon: "⚠️",
-    },
-  ];
-
-  const mockViolations: Violation[] = [
-    {
-      id: "1",
-      violationId: "VIO-2024-001",
-      memberName: "John Smith",
-      memberEmail: "john.smith@email.com",
-      memberUnit: "Unit 4B",
-      violationType: "Parking Violation",
-      description: "Vehicle parked in fire lane",
-      fullDescription:
-        "Red Honda Civic (License: XYZ-789) parked in designated fire lane for over 2 hours. Vehicle was blocking emergency access route. Multiple residents reported the violation. Owner was contacted but vehicle remained in violation.",
-      severity: "high",
-      status: "open",
-      date: "2024-01-15",
-      reportedBy: "Security Guard",
-      photos: ["parking-violation-1.jpg", "parking-violation-2.jpg"],
-      icon: "🚗",
-      location: "Building A - Fire Lane",
-      resolutionNotes: "",
-    },
-    {
-      id: "2",
-      violationId: "VIO-2024-002",
-      memberName: "Maria Garcia",
-      memberEmail: "maria.garcia@email.com",
-      memberUnit: "Unit 7C",
-      violationType: "Noise Violation",
-      description: "Loud music after quiet hours",
-      fullDescription:
-        "Excessive noise levels reported from Unit 7C during quiet hours (10 PM - 7 AM). Multiple neighbors complained about loud music and party sounds continuing until 2:30 AM. This is the third noise violation this month.",
-      severity: "medium",
-      status: "pending",
-      date: "2024-01-14",
-      reportedBy: "Multiple Residents",
-      photos: ["noise-complaint.jpg"],
-      icon: "🔊",
-      location: "Building B - Unit 7C",
-      resolutionNotes:
-        "Warning issued. Resident agreed to keep noise levels down.",
-    },
-    {
-      id: "3",
-      violationId: "VIO-2024-003",
-      memberName: "Robert Johnson",
-      memberEmail: "robert.johnson@email.com",
-      memberUnit: "Unit 2A",
-      violationType: "Pet Violation",
-      description: "Unleashed dog in common area",
-      fullDescription:
-        "Large dog observed running unleashed in the central courtyard and playground area. Pet policy clearly states all dogs must be leashed in common areas. Dog was aggressive toward children playing in the area.",
-      severity: "high",
-      status: "resolved",
-      date: "2024-01-13",
-      reportedBy: "Resident Parent",
-      photos: ["unleashed-dog.jpg"],
-      icon: "🐕",
-      location: "Central Courtyard",
-      resolutionNotes:
-        "Owner fined $150. Agreed to keep dog leashed. No further incidents reported.",
-    },
-    {
-      id: "4",
-      violationId: "VIO-2024-004",
-      memberName: "Lisa Chen",
-      memberEmail: "lisa.chen@email.com",
-      memberUnit: "Unit 5D",
-      violationType: "Trash Violation",
-      description: "Improper waste disposal",
-      fullDescription:
-        "Household trash left outside designated collection area. Bags were torn open by animals, creating mess and attracting pests. Violation of community waste management policy.",
-      severity: "low",
-      status: "resolved",
-      date: "2024-01-12",
-      reportedBy: "Maintenance Staff",
-      photos: ["trash-violation.jpg"],
-      icon: "🗑️",
-      location: "Building C - Rear Entrance",
-      resolutionNotes:
-        "Resident educated on proper disposal procedures. Area cleaned.",
-    },
-    {
-      id: "5",
-      violationId: "VIO-2024-005",
-      memberName: "David Wilson",
-      memberEmail: "david.wilson@email.com",
-      memberUnit: "Unit 8A",
-      violationType: "Smoking Violation",
-      description: "Smoking in non-smoking area",
-      fullDescription:
-        "Resident observed smoking cigarettes in the lobby and elevator areas. Community is designated as smoke-free in all indoor common areas. Multiple residents complained about smoke odor.",
-      severity: "medium",
-      status: "open",
-      date: "2024-01-11",
-      reportedBy: "Front Desk Staff",
-      photos: [],
-      icon: "🚭",
-      location: "Main Lobby",
-      resolutionNotes: "",
-    },
-    {
-      id: "6",
-      violationId: "VIO-2024-006",
-      memberName: "Jennifer Lee",
-      memberEmail: "jennifer.lee@email.com",
-      memberUnit: "Unit 3B",
-      violationType: "Pool Violation",
-      description: "Pool use after hours",
-      fullDescription:
-        "Resident and guests using pool facilities after 10 PM closing time. Pool area was left unsecured with lights on and equipment scattered around. Security cameras captured the violation.",
-      severity: "medium",
-      status: "pending",
-      date: "2024-01-10",
-      reportedBy: "Security System",
-      photos: ["pool-after-hours.jpg"],
-      icon: "🏊",
-      location: "Pool Area",
-      resolutionNotes:
-        "First warning issued. Pool access card temporarily suspended.",
-    },
-    {
-      id: "7",
-      violationId: "VIO-2024-007",
-      memberName: "Michael Brown",
-      memberEmail: "michael.brown@email.com",
-      memberUnit: "Unit 6C",
-      violationType: "Balcony Violation",
-      description: "Unauthorized balcony modifications",
-      fullDescription:
-        "Resident installed unauthorized awning and decorative elements on balcony without HOA approval. Modifications do not comply with community aesthetic guidelines and may violate building codes.",
-      severity: "low",
-      status: "open",
-      date: "2024-01-09",
-      reportedBy: "HOA Inspector",
-      photos: ["balcony-modification.jpg"],
-      icon: "🏠",
-      location: "Building B - Unit 6C Balcony",
-      resolutionNotes: "",
-    },
-    {
-      id: "8",
-      violationId: "VIO-2024-008",
-      memberName: "Sarah Davis",
-      memberEmail: "sarah.davis@email.com",
-      memberUnit: "Unit 1A",
-      violationType: "Guest Violation",
-      description: "Unregistered overnight guests",
-      fullDescription:
-        "Multiple unregistered guests staying overnight for extended period (5+ days). Community policy requires guest registration for stays longer than 3 consecutive days. Parking violations also occurred.",
-      severity: "medium",
-      status: "resolved",
-      date: "2024-01-08",
-      reportedBy: "Property Manager",
-      photos: [],
-      icon: "👥",
-      location: "Unit 1A",
-      resolutionNotes:
-        "Guests registered retroactively. $75 fine applied. Policy explained to resident.",
-    },
-  ];
-
-  const filteredViolations = mockViolations.filter((violation) => {
-    const matchesSearch =
-      violation.memberName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      violation.violationType
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      violation.violationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      violation.location.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" || violation.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalPages = Math.ceil(filteredViolations.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const currentViolations = filteredViolations.slice(startIndex, endIndex);
+  const [filteredViolations, setFilteredViolations] = useState(
+    Array<Violation>
+  );
+  const [totalPages, setTotalPages] = useState(0);
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(0);
+  const [currentViolations, setCurrentViolations] = useState(Array<Violation>);
+  const [openViolationsCount, setOpenViolationsCount] = useState(0);
+  const [resolvedViolationsCount, setResolvedViolationsCount] = useState(0);
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -391,82 +41,6 @@ export default function ViolationsScreen() {
     setRowsPerPage(value);
     setCurrentPage(1);
   };
-
-  const filteredUsers = mockUsers.filter(
-    (user) =>
-      user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
-      user.unit.toLowerCase().includes(userSearchTerm.toLowerCase())
-  );
-
-  const handleUserSelect = (user: User) => {
-    setSelectedUser(user.id);
-    setUserSearchTerm(`${user.name} - ${user.unit}`);
-    setShowUserDropdown(false);
-  };
-
-  const handleViolationTypeChange = (typeId: string) => {
-    setSelectedViolationType(typeId);
-    const selectedType = violationTypes.find((type) => type.id === typeId);
-    if (selectedType) {
-      setViolationContent(selectedType.defaultContent);
-    } else {
-      setViolationContent("");
-    }
-  };
-
-  const handleSendViolation = () => {
-    if (!selectedUser || !selectedViolationType || !violationContent.trim()) {
-      alert("Please fill in all required fields");
-      return;
-    }
-
-    const user = mockUsers.find((u) => u.id === selectedUser);
-    const violationType = violationTypes.find(
-      (vt) => vt.id === selectedViolationType
-    );
-
-    if (user && violationType) {
-      alert(
-        `Violation notice sent to ${user.name} (${user.unit}) for ${violationType.name}`
-      );
-      setShowSendViolationModal(false);
-      setSelectedUser("");
-      setSelectedViolationType("");
-      setViolationContent("");
-      setUserSearchTerm("");
-    }
-  };
-
-  const getStatusChip = (status: string) => {
-    const styles = {
-      open: "bg-red-100 text-red-800 border-red-200",
-      pending: "bg-amber-100 text-amber-800 border-amber-200",
-      resolved: "bg-green-100 text-green-800 border-green-200",
-    };
-
-    const labels = {
-      open: "Open",
-      pending: "Pending",
-      resolved: "Resolved",
-    };
-
-    return (
-      <span
-        className={`px-2 py-1 rounded-full text-xs font-medium border ${
-          styles[status as keyof typeof styles]
-        }`}
-      >
-        {labels[status as keyof typeof labels]}
-      </span>
-    );
-  };
-
-  const openViolationsCount = mockViolations.filter(
-    (v) => v.status === "open"
-  ).length;
-  const resolvedViolationsCount = mockViolations.filter(
-    (v) => v.status === "resolved"
-  ).length;
 
   const getStatusDisplay = (status: string) => {
     if (status === "open") {
@@ -490,28 +64,61 @@ export default function ViolationsScreen() {
     }
   };
 
-  const handleGetUsers = async (address: string) => {
-    const result = await getUsers(address);
+  const handleGetAllViolations = async () => {
+    try {
+      const result = await getViolations(null).unwrap();
+      const violations = result.violations;
+
+      setTotalPages(Math.ceil(violations.length / rowsPerPage));
+      setStartIndex((currentPage - 1) * rowsPerPage);
+      setEndIndex(startIndex + rowsPerPage);
+      const currentViolations = violations.slice(
+        startIndex,
+        startIndex + rowsPerPage
+      );
+      setCurrentViolations(currentViolations);
+      const openViolationsCount = violations.filter(
+        (v) => v.status === "OPEN"
+      ).length;
+      setOpenViolationsCount(openViolationsCount);
+      setResolvedViolationsCount(violations.length - openViolationsCount);
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error?.data.error || "Unable to load violations",
+        })
+      );
+    }
   };
 
   useEffect(() => {
-    if (userSearchTerm && userSearchTerm.length > 2) {
-      handleGetUsers(userSearchTerm);
-    }
-  }, [userSearchTerm]);
+    handleGetAllViolations();
+  }, []);
+
+  useEffect(() => {
+    const filteredViolations = currentViolations.filter((violation) => {
+      const matchesSearch =
+        violation.user.firstName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        violation.user.lastName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        violation.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        violation.id.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "all" || violation.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    setFilteredViolations(filteredViolations);
+  }, [searchTerm, currentViolations]);
 
   return (
-    <div className="min-h-screen bg-[#1E293B] p-[10px]">
-      <Sidebar />
-
-      {type && (
-        <Notification
-          type={type}
-          message={message}
-          onClose={() => dispatch(setNotification({ type: null, message: "" }))}
-        />
-      )}
-
+    <DashboardLayout>
       <div className="lg:ml-[260px] bg-white rounded-lg min-h-[calc(100vh-20px)] flex flex-col">
         {/* Top Bar */}
         <div className="bg-white border-b border-gray-200 px-4 py-3 rounded-t-lg">
@@ -589,9 +196,9 @@ export default function ViolationsScreen() {
                   <div className="flex items-center justify-between px-6">
                     <nav className="flex space-x-8">
                       <button
-                        onClick={() => setStatusFilter("open")}
+                        onClick={() => setStatusFilter("OPEN")}
                         className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-base whitespace-nowrap ${
-                          statusFilter === "open"
+                          statusFilter === "OPEN"
                             ? "border-[#1FA372] text-[#1FA372]"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                         }`}
@@ -600,9 +207,9 @@ export default function ViolationsScreen() {
                         <span>Open</span>
                       </button>
                       <button
-                        onClick={() => setStatusFilter("resolved")}
+                        onClick={() => setStatusFilter("RESOLVED")}
                         className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-base whitespace-nowrap ${
-                          statusFilter === "resolved"
+                          statusFilter === "RESOLVED"
                             ? "border-[#1FA372] text-[#1FA372]"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                         }`}
@@ -651,7 +258,7 @@ export default function ViolationsScreen() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {currentViolations.length === 0 ? (
+                        {currentViolations?.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="px-6 py-12 text-center">
                               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -666,7 +273,7 @@ export default function ViolationsScreen() {
                             </td>
                           </tr>
                         ) : (
-                          currentViolations.map((violation) => (
+                          currentViolations?.map((violation) => (
                             <tr
                               key={violation.id}
                               className={`hover:bg-gray-50 transition-colors cursor-pointer ${
@@ -679,21 +286,22 @@ export default function ViolationsScreen() {
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div>
                                   <div className="text-base font-medium text-black">
-                                    {violation.memberName}
+                                    {violation.user.firstName}{" "}
+                                    {violation.user.lastName}
                                   </div>
                                   <div className="text-base font-medium text-black">
-                                    {violation.memberEmail}
+                                    {violation.user.emailId}
                                   </div>
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-base font-medium text-black">
-                                  {violation.memberUnit}
+                                  To Do
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-base font-medium text-black">
-                                  {violation.violationType}
+                                  {violation.type}
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
@@ -705,7 +313,7 @@ export default function ViolationsScreen() {
                                   suppressHydrationWarning={true}
                                 >
                                   {new Date(
-                                    violation.date
+                                    violation.createdAt
                                   ).toLocaleDateString()}
                                 </div>
                               </td>
@@ -717,7 +325,7 @@ export default function ViolationsScreen() {
                   </div>
 
                   {/* Pagination */}
-                  {filteredViolations.length > 0 && (
+                  {filteredViolations && filteredViolations.length > 0 && (
                     <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-600">
@@ -738,7 +346,7 @@ export default function ViolationsScreen() {
                       <div className="flex items-center gap-4">
                         <span className="text-sm text-gray-600">
                           {startIndex + 1}-
-                          {Math.min(endIndex, filteredViolations.length)} of{" "}
+                          {Math.min(endIndex, filteredViolations?.length)} of{" "}
                           {filteredViolations.length}
                         </span>
                         <div className="flex gap-2">
@@ -780,6 +388,6 @@ export default function ViolationsScreen() {
         isOpen={showSendViolationModal}
         onClose={() => setShowSendViolationModal(false)}
       />
-    </div>
+    </DashboardLayout>
   );
 }

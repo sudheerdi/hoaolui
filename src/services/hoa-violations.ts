@@ -15,9 +15,15 @@ export const hoaViolationsApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+    getViolations: builder.query<ViolationsType, any>({
+      query: () => ({
+        url: "violations",
+        method: "GET",
+      }),
+    }),
     getViolationDefaults: builder.query<ViolationDefaultsType, any>({
       query: () => ({
-        url: "violation-defaults",
+        url: "violations/defaults",
         method: "GET",
       }),
     }),
@@ -34,5 +40,8 @@ export const hoaViolationsApi = createApi({
   }),
 });
 
-export const { useLazyGetViolationDefaultsQuery, useCreateViolationMutation } =
-  hoaViolationsApi;
+export const {
+  useLazyGetViolationsQuery,
+  useLazyGetViolationDefaultsQuery,
+  useCreateViolationMutation,
+} = hoaViolationsApi;

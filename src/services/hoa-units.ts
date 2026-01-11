@@ -21,7 +21,16 @@ export const hoaUnitsApi = createApi({
         method: "GET",
       }),
     }),
+    setUnitsBulkUpload: builder.mutation<any, any>({
+      query: (formData) => ({
+        url: "bulk",
+        method: "POST",
+        body: formData,
+        formData: true,
+      }),
+    }),
   }),
 });
 
-export const { useLazyGetUnitsQuery } = hoaUnitsApi;
+export const { useLazyGetUnitsQuery, useSetUnitsBulkUploadMutation } =
+  hoaUnitsApi;

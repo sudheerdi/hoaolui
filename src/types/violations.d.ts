@@ -1,3 +1,31 @@
+type Violation = {
+  id: string;
+  type: string;
+  description: string;
+  membershipId: string;
+  responseDueDate: string;
+  complianceDueDate: string;
+  user: {
+    mobileNumber: string;
+    firstName: string;
+    userId: string;
+    lastName: string;
+    emailId: string;
+  };
+  createdAt: string;
+  generatedNotice: string;
+  reportedById: string;
+  amountToBePaid: number;
+  status: string;
+};
+
+type ViolationsType = {
+  violationDefaults: Array<ViolationType>;
+  communityId: string;
+  violations: Array<Violation>;
+  totalViolations: number;
+};
+
 type ViolationType = {
   id: string;
   violationType: string;
