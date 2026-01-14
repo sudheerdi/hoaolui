@@ -12,6 +12,15 @@ type Violation = {
     lastName: string;
     emailId: string;
   };
+  address: {
+    state: string;
+    country: string;
+    city: string;
+    address2: string;
+    address1: string;
+    postalCode: string;
+  };
+
   createdAt: string;
   generatedNotice: string;
   reportedById: string;
@@ -40,18 +49,7 @@ type ViolationDefaultsType = {
 };
 
 type ViolationRequestType = {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  emailId: string;
-  mobileNumber: string;
   unitId: string;
-  address1: string;
-  address2: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
   membershipId: string;
   type: string;
   dynamicValues: {

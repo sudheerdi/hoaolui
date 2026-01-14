@@ -6,6 +6,7 @@ import {
   hoaViolationsApi,
   hoaUserSearchApi,
   hoaUnitsApi,
+  hoaPollsApi,
 } from "../services";
 
 export const makeStore = () => {
@@ -19,7 +20,8 @@ export const makeStore = () => {
         hoaUserLoginApi.middleware,
         hoaViolationsApi.middleware,
         hoaUserSearchApi.middleware,
-        hoaUnitsApi.middleware
+        hoaUnitsApi.middleware,
+        hoaPollsApi.middleware
       ),
   });
 };

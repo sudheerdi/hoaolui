@@ -11,7 +11,7 @@ const DashboardLayout: React.FC<React.PropsWithChildren<{}>> = ({
   const { type, message } = useAppSelector((state) => state.hoaNotification);
   const dispatch = useAppDispatch();
   return (
-    <div className="min-h-screen flex flex-col  bg-[#1E293B] overflow-hidden">
+    <div className="min-h-screen flex flex-col  bg-[#1E293B] overflow-hidden p-[10px]">
       <Sidebar />
       <Notification
         type={type}

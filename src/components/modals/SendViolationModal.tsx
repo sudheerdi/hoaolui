@@ -28,7 +28,8 @@ export default function SendViolationModal({
   ] = useLazyGetViolationDefaultsQuery();
   const [getUsers, { data: usersData, isLoading: isLoadingUsers }] =
     useLazyGetUsersQuery();
-  const [createViolation] = useCreateViolationMutation();
+  const [createViolation, { isSuccess: createViolationSuccess }] =
+    useCreateViolationMutation();
 
   const [selectedViolation, setSelectedViolation] =
     useState<ViolationType | null>(null);
@@ -59,19 +60,8 @@ export default function SendViolationModal({
       return;
     }
 
-    const requestData: ViolationRequestType = {
-      userId: selectedUser.userId,
-      firstName: selectedUser.firstName,
-      lastName: selectedUser.lastName,
-      emailId: selectedUser.emailId,
-      mobileNumber: selectedUser.mobileNumber,
+    const requestData: any = {
       unitId: selectedUser.unitId,
-      address1: selectedUser.address1,
-      address2: selectedUser.address2,
-      city: selectedUser.city,
-      state: selectedUser.state,
-      zipCode: selectedUser.zipCode,
-      country: selectedUser.country,
       membershipId: selectedUser.membershipId,
       type: selectedViolation?.violationType || "",
       dynamicValues: {
@@ -86,6 +76,7 @@ export default function SendViolationModal({
 
     try {
       await createViolation(requestData);
+
       dispatch(
         setNotification({
           type: "success",
