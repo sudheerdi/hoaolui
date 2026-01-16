@@ -75,7 +75,7 @@ export default function SendViolationModal({
     };
 
     try {
-      await createViolation(requestData);
+      await createViolation(requestData).unwrap();
 
       dispatch(
         setNotification({
@@ -147,7 +147,7 @@ export default function SendViolationModal({
 
   const handleGetViolationDefaults = async () => {
     try {
-      await getViolationDefaults(null);
+      await getViolationDefaults(null).unwrap();
     } catch (error: any) {
       setNotification({
         type: "error",
@@ -157,7 +157,16 @@ export default function SendViolationModal({
   };
 
   const handleGetUsers = async (searchTerm: string) => {
-    await getUsers(searchTerm);
+    try {
+      await getUsers(searchTerm).unwrap();
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error ? error?.data.error : "Unable to fetch users data.",
+        })
+      );
+    }
   };
 
   const handleResetForm = () => {

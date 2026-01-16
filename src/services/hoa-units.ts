@@ -23,7 +23,7 @@ export const hoaUnitsApi = createApi({
     }),
     setUnitsBulkUpload: builder.mutation<any, any>({
       query: (formData) => ({
-        url: "bulk",
+        url: "members/bulk",
         method: "POST",
         body: formData,
         formData: true,

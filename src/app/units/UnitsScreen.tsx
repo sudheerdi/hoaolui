@@ -482,8 +482,7 @@ export default function UnitsScreen() {
     }
 
     try {
-      const response = await setUnitsBulkUpload(formData);
-      console.log("Bulk upload response:", response);
+      await setUnitsBulkUpload(formData).unwrap();
       dispatch(
         setNotification({
           type: "success",
@@ -564,9 +563,8 @@ export default function UnitsScreen() {
 
   const handleGetUnits = async () => {
     try {
-      await getUnits(null);
+      await getUnits(null).unwrap();
     } catch (error: any) {
-      console.error("Error fetching units:", error);
       dispatch(
         setNotification({
           type: "error",

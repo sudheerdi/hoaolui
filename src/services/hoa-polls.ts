@@ -22,6 +22,13 @@ export const hoaPollsApi = createApi({
         params,
       }),
     }),
+    createPollOption: builder.mutation<any, any>({
+      query: (params) => ({
+        url: "polls",
+        method: "POST",
+        params,
+      }),
+    }),
   }),
 });
 
