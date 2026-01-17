@@ -147,225 +147,6 @@ export default function UnitsScreen() {
     },
   ];
 
-  const mockUnits: Unit[] = [
-    {
-      id: "1",
-      name: "John Smith",
-      address: "55, forest way ,\nGreensboro, NC-27409.",
-      type: "owner",
-    },
-    {
-      id: "2",
-      name: "Maria Garcia",
-      address: "42, maple street ,\nGreensboro, NC-27408.",
-      type: "tenant",
-    },
-    {
-      id: "3",
-      name: "Robert Johnson",
-      address: "78, oak avenue ,\nGreensboro, NC-27410.",
-      type: "owner",
-    },
-    {
-      id: "4",
-      name: "Lisa Chen",
-      address: "91, pine road ,\nGreensboro, NC-27407.",
-      type: "owner",
-    },
-    {
-      id: "5",
-      name: "David Wilson",
-      address: "23, elm drive ,\nGreensboro, NC-27411.",
-      type: "tenant",
-    },
-    {
-      id: "6",
-      name: "Jennifer Lee",
-      address: "67, birch lane ,\nGreensboro, NC-27406.",
-      type: "owner",
-    },
-    {
-      id: "7",
-      name: "Michael Brown",
-      address: "15, cedar court ,\nGreensboro, NC-27412.",
-      type: "tenant",
-    },
-    {
-      id: "8",
-      name: "Sarah Davis",
-      address: "89, willow way ,\nGreensboro, NC-27405.",
-      type: "owner",
-    },
-    {
-      id: "9",
-      name: "James Wilson",
-      address: "34, spruce street ,\nGreensboro, NC-27413.",
-      type: "owner",
-    },
-    {
-      id: "10",
-      name: "Emily Rodriguez",
-      address: "56, poplar place ,\nGreensboro, NC-27404.",
-      type: "tenant",
-    },
-    {
-      id: "11",
-      name: "Thomas Anderson",
-      address: "12, hickory hill ,\nGreensboro, NC-27414.",
-      type: "owner",
-    },
-    {
-      id: "12",
-      name: "Amanda White",
-      address: "98, chestnut circle ,\nGreensboro, NC-27403.",
-      type: "tenant",
-    },
-    {
-      id: "13",
-      name: "Christopher Lee",
-      address: "45, walnut walk ,\nGreensboro, NC-27415.",
-      type: "owner",
-    },
-    {
-      id: "14",
-      name: "Jessica Taylor",
-      address: "73, magnolia manor ,\nGreensboro, NC-27402.",
-      type: "tenant",
-    },
-    {
-      id: "15",
-      name: "Daniel Martinez",
-      address: "29, dogwood drive ,\nGreensboro, NC-27416.",
-      type: "owner",
-    },
-    {
-      id: "16",
-      name: "Michelle Thompson",
-      address: "61, sycamore square ,\nGreensboro, NC-27401.",
-      type: "owner",
-    },
-    {
-      id: "17",
-      name: "Kevin Garcia",
-      address: "84, redwood ridge ,\nGreensboro, NC-27417.",
-      type: "tenant",
-    },
-    {
-      id: "18",
-      name: "Rachel Moore",
-      address: "17, cypress creek ,\nGreensboro, NC-27418.",
-      type: "owner",
-    },
-    {
-      id: "19",
-      name: "Brandon Clark",
-      address: "52, juniper junction ,\nGreensboro, NC-27419.",
-      type: "tenant",
-    },
-    {
-      id: "20",
-      name: "Nicole Lewis",
-      address: "76, aspen alley ,\nGreensboro, NC-27420.",
-      type: "owner",
-    },
-    {
-      id: "21",
-      name: "Ryan Walker",
-      address: "38, fir forest ,\nGreensboro, NC-27421.",
-      type: "tenant",
-    },
-    {
-      id: "22",
-      name: "Stephanie Hall",
-      address: "63, beech boulevard ,\nGreensboro, NC-27422.",
-      type: "owner",
-    },
-    {
-      id: "23",
-      name: "Justin Young",
-      address: "19, palm parkway ,\nGreensboro, NC-27423.",
-      type: "owner",
-    },
-    {
-      id: "24",
-      name: "Melissa King",
-      address: "85, bamboo bend ,\nGreensboro, NC-27424.",
-      type: "tenant",
-    },
-    {
-      id: "25",
-      name: "Andrew Wright",
-      address: "41, laurel lane ,\nGreensboro, NC-27425.",
-      type: "owner",
-    },
-    {
-      id: "26",
-      name: "Heather Lopez",
-      address: "74, rose ridge ,\nGreensboro, NC-27426.",
-      type: "tenant",
-    },
-    {
-      id: "27",
-      name: "Joshua Hill",
-      address: "26, tulip terrace ,\nGreensboro, NC-27427.",
-      type: "owner",
-    },
-    {
-      id: "28",
-      name: "Crystal Scott",
-      address: "59, lily lane ,\nGreensboro, NC-27428.",
-      type: "owner",
-    },
-    {
-      id: "29",
-      name: "Nathan Green",
-      address: "92, daisy drive ,\nGreensboro, NC-27429.",
-      type: "tenant",
-    },
-    {
-      id: "30",
-      name: "Amber Adams",
-      address: "14, violet valley ,\nGreensboro, NC-27430.",
-      type: "owner",
-    },
-    {
-      id: "31",
-      name: "Tyler Baker",
-      address: "47, iris avenue ,\nGreensboro, NC-27431.",
-      type: "tenant",
-    },
-    {
-      id: "32",
-      name: "Brittany Nelson",
-      address: "81, orchid oaks ,\nGreensboro, NC-27432.",
-      type: "owner",
-    },
-    {
-      id: "33",
-      name: "Jacob Carter",
-      address: "33, sunflower street ,\nGreensboro, NC-27433.",
-      type: "owner",
-    },
-    {
-      id: "34",
-      name: "Samantha Mitchell",
-      address: "68, carnation court ,\nGreensboro, NC-27434.",
-      type: "tenant",
-    },
-    {
-      id: "35",
-      name: "Aaron Perez",
-      address: "25, peony place ,\nGreensboro, NC-27435.",
-      type: "owner",
-    },
-    {
-      id: "36",
-      name: "Danielle Roberts",
-      address: "57, azalea avenue ,\nGreensboro, NC-27436.",
-      type: "tenant",
-    },
-  ];
-
   const mockDocuments: Document[] = [
     {
       id: "1",
@@ -581,6 +362,10 @@ export default function UnitsScreen() {
   }, [getUnits]);
 
   useEffect(() => {
+    if (occupancyFilter === "tenant") {
+      setFilteredUnits([]);
+      return;
+    }
     if (searchTerm === "") {
       setFilteredUnits(unitsData?.units);
       return;
@@ -595,11 +380,13 @@ export default function UnitsScreen() {
           .includes(searchTerm.toLowerCase()) ||
         unit.address1.toLowerCase().includes(searchTerm.toLowerCase()) ||
         unit.address2.toLowerCase().includes(searchTerm.toLowerCase());
-      //const matchesType = unit.type === occupancyFilter;
-      return matchesSearch;
+      const matchesType =
+        (Object.hasOwn(unit, "owners") ? "owner" : "tenant") ===
+        occupancyFilter;
+      return matchesSearch && matchesType;
     });
     setFilteredUnits(units);
-  }, [searchTerm, unitsData]);
+  }, [searchTerm, unitsData, occupancyFilter]);
 
   return (
     <DashboardLayout>

@@ -1,3 +1,5 @@
+"use client";
+
 import { useUserAuthToken } from "@/src/helpers/hooks/useUserAuthToken";
 import PollsScreen from "./PollsScreen";
 
