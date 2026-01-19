@@ -35,7 +35,6 @@ export default function SendViolationModal({
     useState<ViolationType | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
-  const [violationContent, setViolationContent] = useState("");
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
@@ -47,7 +46,6 @@ export default function SendViolationModal({
   );
   const [vehicleDescription, setVehicleDescription] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
-  const [dateObserved, setDateObserved] = useState("");
 
   const handleUserSelect = (user: UserType) => {
     setSelectedUser(user);
@@ -65,8 +63,8 @@ export default function SendViolationModal({
       membershipId: selectedUser.membershipId,
       type: selectedViolation?.violationType || "",
       dynamicValues: {
-        date: dateObserved,
-        description: violationContent,
+        date: handleDateMatch(),
+        description: handleDescMatch(),
         violationPicture:
           uploadedImages.map((img) => URL.createObjectURL(img))[0] || "",
         vehicleDescription: vehicleDescription,
@@ -116,18 +114,19 @@ export default function SendViolationModal({
     setShowPDFPreview(false);
   };
 
-  const getPDFFormData = () => {
-    let dateObs = "";
+  const handleDateMatch = () => {
     const dateMatch = description.match(
       /Date Observed:\s*(\d{2}\/\d{2}\/\d{4})/
     );
-    if (dateMatch) {
-      dateObs = dateMatch[1];
-    }
+    return dateMatch ? dateMatch[1] : "";
+  };
 
+  const handleDescMatch = () => {
     const descMatch = description.match(/Description:\s*(.+)/);
-    const descText = descMatch ? descMatch[1].trim() : "";
+    return descMatch ? descMatch[1].trim() : "";
+  };
 
+  const getPDFFormData = () => {
     return {
       communityName: hoaUser.memberships[0]?.communityName || "",
       date: new Date().toLocaleDateString(),
@@ -136,9 +135,9 @@ export default function SendViolationModal({
       homeownerName:
         selectedUser?.firstName + " " + selectedUser?.lastName || "",
       violationType: selectedViolation?.violationType || "",
-      description: descText,
+      description: handleDescMatch(),
       ccrsSection: "",
-      dateObserved: dateObs,
+      dateObserved: handleDateMatch(),
       timeObserved: timeObserved,
       reportedBy: "",
       evidence: uploadedImages,
@@ -173,13 +172,11 @@ export default function SendViolationModal({
     onClose();
     setSelectedUser(null);
     setSelectedViolation(null);
-    setViolationContent("");
     setUserSearchTerm("");
     setShowUserDropdown(false);
     setUploadedImages([]);
     setTimeObserved("");
     setDescription("Date Observed: mm/dd/yyyy\nDescription: ");
-    setDateObserved("");
     setVehicleDescription("");
     setLicensePlate("");
   };
