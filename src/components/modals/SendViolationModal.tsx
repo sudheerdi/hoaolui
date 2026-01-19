@@ -89,7 +89,7 @@ export default function SendViolationModal({
       dispatch(
         setNotification({
           type: "error",
-          message: "Failed to create violation: Membership not found",
+          message: error?.data?.error,
         })
       );
     }

@@ -26,7 +26,7 @@ export default function Notification({
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-slide-in">
+    <div className="fixed top-4 right-4 z-[60] animate-slide-in">
       <div
         className={`flex items-start gap-3 px-6 py-4 rounded-lg shadow-lg max-w-md ${
           type === "success" ? "bg-white border-l-4" : "bg-white border-l-4"
