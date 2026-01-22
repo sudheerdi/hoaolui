@@ -1,46 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Sidebar from "../../components/Sidebar";
+import { use, useEffect, useState } from "react";
 import UserProfile from "../../components/UserProfile";
-import { useCreatePollMutation } from "@/src/services";
+import { useCreatePollMutation, useLazyGetPollsQuery } from "@/src/services";
 import DashboardLayout from "@/src/components/layout/DashboardLayout";
 import { useAppDispatch } from "@/src/lib/hooks";
 import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
-
-// Interface definition for Poll
-interface Poll {
-  id: string;
-  title: string;
-  type: "anonymous" | "open";
-  status: "active" | "closed";
-  totalVotes: number;
-  createdDate: string;
-  endDate: string;
-  options: {
-    text: string;
-    votes: number;
-    percentage: number;
-  }[];
-}
-
-interface PollOption {
-  id: string;
-  text: string;
-}
-
-interface PollData {
-  question: string;
-  options: PollOption[];
-  type: "ANONYMOUS" | "OPEN";
-  endDate: string;
-  description: string;
-}
 
 export default function PollsScreen() {
   const dispatch = useAppDispatch();
 
   const [createPoll] = useCreatePollMutation();
+  const [getPolls, { data: pollsData, isSuccess }] = useLazyGetPollsQuery();
   // Original state variables
   const [selectedPolls, setSelectedPolls] = useState<string[]>([]);
   const [selectedClosedPoll, setSelectedClosedPoll] =
@@ -49,13 +20,13 @@ export default function PollsScreen() {
   const [hoveredOption, setHoveredOption] = useState<number | null>(null);
 
   // New state variables from modified content
-  const [activeTab, setActiveTab] = useState<"active" | "closed">("active");
+  const [activeTab, setActiveTab] = useState<"DRAFT" | "closed">("DRAFT");
   const [closedPollPage, setClosedPollPage] = useState(1);
 
   // Create poll popover state
   const [showCreatePopover, setShowCreatePopover] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [pollData, setPollData] = useState<PollData>({
+  const [pollData, setPollData] = useState<PollsRequestType>({
     question: "",
     options: [
       { id: "1", text: "" },
@@ -66,115 +37,20 @@ export default function PollsScreen() {
     description: "",
   });
 
-  // Mock data for polls
-  const mockPolls: Poll[] = [
-    {
-      id: "POLL-001",
-      title:
-        "Should we install new playground equipment in the community park?",
-      type: "open",
-      status: "active",
-      totalVotes: 127,
-      createdDate: "2024-01-15",
-      endDate: "2024-01-30",
-      options: [
-        { text: "Yes, install new equipment", votes: 89, percentage: 70 },
-        { text: "No, keep current equipment", votes: 25, percentage: 20 },
-        { text: "Repair existing equipment first", votes: 13, percentage: 10 },
-      ],
-    },
-    {
-      id: "POLL-002",
-      title: "What time should the community pool close during weekdays?",
-      type: "anonymous",
-      status: "active",
-      totalVotes: 94,
-      createdDate: "2024-01-12",
-      endDate: "2024-01-25",
-      options: [
-        { text: "8:00 PM", votes: 42, percentage: 45 },
-        { text: "9:00 PM", votes: 35, percentage: 37 },
-        { text: "10:00 PM", votes: 17, percentage: 18 },
-      ],
-    },
-    {
-      id: "POLL-003",
-      title: "Which community event would you like to see this summer?",
-      type: "open",
-      status: "active",
-      totalVotes: 156,
-      createdDate: "2024-01-05",
-      endDate: "2024-01-20",
-      options: [
-        { text: "BBQ & Music Festival", votes: 78, percentage: 50 },
-        { text: "Movie Night Under Stars", votes: 47, percentage: 30 },
-        { text: "Sports Tournament", votes: 31, percentage: 20 },
-      ],
-    },
-    {
-      id: "POLL-004",
-      title: "Should we implement a new guest parking policy?",
-      type: "anonymous",
-      status: "closed",
-      totalVotes: 73,
-      createdDate: "2024-01-10",
-      endDate: "2024-01-28",
-      options: [
-        { text: "Yes, limit to 2 hours", votes: 38, percentage: 52 },
-        { text: "Yes, require permits", votes: 22, percentage: 30 },
-        { text: "No, keep current policy", votes: 13, percentage: 18 },
-      ],
-    },
-    {
-      id: "POLL-005",
-      title: "What improvements should we prioritize for the clubhouse?",
-      type: "open",
-      status: "closed",
-      totalVotes: 112,
-      createdDate: "2023-12-28",
-      endDate: "2024-01-15",
-      options: [
-        { text: "Kitchen renovation", votes: 56, percentage: 50 },
-        { text: "New furniture", votes: 34, percentage: 30 },
-        { text: "Audio/Visual upgrades", votes: 22, percentage: 20 },
-      ],
-    },
-    {
-      id: "POLL-006",
-      title: "Should we allow food trucks in the community on weekends?",
-      type: "anonymous",
-      status: "closed",
-      totalVotes: 89,
-      createdDate: "2024-01-08",
-      endDate: "2024-01-22",
-      options: [
-        { text: "Yes, every weekend", votes: 45, percentage: 51 },
-        { text: "Yes, once a month", votes: 31, percentage: 35 },
-        { text: "No, not allowed", votes: 13, percentage: 14 },
-      ],
-    },
-  ];
-
-  // Filter polls based on active tab (active or closed)
-  const filteredPolls = mockPolls.filter((poll) =>
-    activeTab === "active" ? poll.status === "active" : poll.status === "closed"
-  );
-
-  // Get selected poll objects - show first 3 for active, selected one for closed
-  const selectedPollObjects =
-    activeTab === "active"
-      ? filteredPolls.slice(0, 3)
-      : filteredPolls.filter((poll) => poll.id === selectedClosedPoll);
+  const [filteredPolls, setFilteredPolls] = useState<Poll[] | undefined>([]);
+  const [selectedPollObjects, setSelectedPollObjects] = useState<
+    Poll[] | undefined
+  >([]);
+  const [totalClosedPages, setTotalClosedPages] = useState(0);
+  const [currentClosedPolls, setCurrentClosedPolls] = useState<
+    Poll[] | undefined
+  >([]);
 
   // Closed polls pagination - Updated to show 3 rows per page
   const closedPollsPerPage = 3;
-  const totalClosedPages = Math.ceil(filteredPolls.length / closedPollsPerPage);
+
   const closedStartIndex = (closedPollPage - 1) * closedPollsPerPage;
   const closedEndIndex = closedStartIndex + closedPollsPerPage;
-  const currentClosedPolls =
-    activeTab === "closed"
-      ? filteredPolls.slice(closedStartIndex, closedEndIndex)
-      : [];
 
   // Closed polls pagination handlers
   const handleClosedPrevPage = () => {
@@ -189,11 +65,11 @@ export default function PollsScreen() {
     }
   };
 
-  const handleTabChange = (tab: "active" | "closed") => {
+  const handleTabChange = (tab: "DRAFT" | "closed") => {
     setActiveTab(tab);
     setClosedPollPage(1);
     // Set default selections based on tab
-    if (tab === "active") {
+    if (tab === "DRAFT") {
       setSelectedPolls([]);
     } else {
       setSelectedClosedPoll("POLL-004");
@@ -229,19 +105,16 @@ export default function PollsScreen() {
     setPollData((prev) => ({
       ...prev,
       options: prev.options.map((option) =>
-        option.id === id ? { ...option, text } : option
+        option.id === id ? { ...option, text } : option,
       ),
     }));
   };
 
   const handleSubmit = async () => {
     try {
-      const requestParams = {
-        question: pollData.question,
-        type: pollData.type,
-        description: pollData.description,
-      };
-      await createPoll(requestParams);
+      const requestData: PollsRequestType = { ...pollData };
+      requestData.endDate = `${new Intl.DateTimeFormat("en-CA").format(new Date(pollData.endDate))}T23:59:00`;
+      await createPoll(requestData);
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
@@ -253,7 +126,7 @@ export default function PollsScreen() {
         setNotification({
           type: "error",
           message: error?.data.error,
-        })
+        }),
       );
     }
   };
@@ -279,6 +152,46 @@ export default function PollsScreen() {
     );
   };
 
+  const handleTotalVotes = (options: Poll["options"]) => {
+    return options.reduce((total, option) => total + option.noOfVotes, 0);
+  };
+
+  const handleGetPolls = async () => {
+    const data = await getPolls().unwrap();
+    // Filter polls based on active tab (active or closed)
+    const filteredPolls = data?.filter((poll) =>
+      activeTab === "DRAFT"
+        ? poll.status === "DRAFT"
+        : poll.status === "closed",
+    );
+    setFilteredPolls(filteredPolls);
+  };
+
+  useEffect(() => {
+    handleGetPolls();
+  }, []);
+
+  useEffect(() => {
+    // Get selected poll objects - show first 3 for active, selected one for closed
+    const selectedPollObjects =
+      activeTab === "DRAFT"
+        ? filteredPolls?.slice(0, 3)
+        : filteredPolls?.filter((poll) => poll.id === selectedClosedPoll);
+    setSelectedPollObjects(selectedPollObjects);
+
+    setTotalClosedPages(
+      filteredPolls?.length
+        ? Math.ceil(filteredPolls?.length / closedPollsPerPage)
+        : 0,
+    );
+
+    setCurrentClosedPolls(
+      activeTab === "closed"
+        ? filteredPolls?.slice(closedStartIndex, closedEndIndex)
+        : [],
+    );
+  }, [filteredPolls, activeTab]);
+
   const renderChart = (poll: Poll, index: number) => {
     const colors = ["#14b8a6", "#3b82f6", "#8b5cf6", "#f59e0b"];
 
@@ -289,9 +202,10 @@ export default function PollsScreen() {
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-medium text-black">{poll.title}</h3>
+            <h3 className="text-base font-medium text-black">
+              {poll.question}
+            </h3>
             <div className="flex items-center space-x-2 mt-1">
-              <span className="text-sm text-black font-medium">{poll.id}</span>
               <span
                 className={`px-2 py-1 rounded-full text-xs font-medium ${
                   poll.type === "anonymous"
@@ -305,7 +219,7 @@ export default function PollsScreen() {
           </div>
           <div className="text-right">
             <div className="text-xl font-bold text-teal-600">
-              {poll.totalVotes}
+              {handleTotalVotes(poll.options)}
             </div>
             <div className="text-sm text-black font-medium">Total Votes</div>
           </div>
@@ -329,12 +243,14 @@ export default function PollsScreen() {
 
               return poll.options.map((option, optionIndex) => {
                 const startPercentage = cumulativePercentage;
-                cumulativePercentage += option.percentage;
+                // cumulativePercentage += option.percentage;
+                cumulativePercentage += 0; // To Do
 
                 const totalArcLength = 251.2;
                 const startOffset = (startPercentage / 100) * totalArcLength;
-                const segmentLength =
-                  (option.percentage / 100) * totalArcLength;
+                // const segmentLength =
+                //   (option.percentage / 100) * totalArcLength;
+                const segmentLength = (0 / 100) * totalArcLength; // To Do
 
                 return (
                   <path
@@ -359,7 +275,7 @@ export default function PollsScreen() {
               textAnchor="middle"
               className="text-lg font-bold fill-gray-900"
             >
-              {poll.totalVotes}
+              {/* {poll.totalVotes} */} To Do
             </text>
             <text
               x="100"
@@ -387,15 +303,15 @@ export default function PollsScreen() {
                   }}
                 ></div>
                 <span className="text-sm text-black font-medium">
-                  {option.text}
+                  {option.description}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-black">
-                  {option.percentage}%
+                  {/* {option.percentage}% */} To Do
                 </span>
                 <span className="text-sm text-black font-medium">
-                  {option.votes}
+                  {option.noOfVotes}
                 </span>
               </div>
             </div>
@@ -704,9 +620,9 @@ export default function PollsScreen() {
               {/* Tab Selector */}
               <div className="px-4 py-4 bg-gray-50 flex gap-4">
                 <button
-                  onClick={() => handleTabChange("active")}
+                  onClick={() => handleTabChange("DRAFT")}
                   className={`px-4 py-2 font-medium transition-colors ${
-                    activeTab === "active"
+                    activeTab === "DRAFT"
                       ? "text-[#1FA372] border-b-2 border-[#1FA372]"
                       : "text-gray-500"
                   }`}
@@ -726,21 +642,21 @@ export default function PollsScreen() {
               </div>
 
               {/* Charts Section */}
-              {selectedPollObjects.length > 0 && (
+              {selectedPollObjects && selectedPollObjects.length > 0 && (
                 <div className="px-4 mb-6">
                   <div
                     className={`${
                       activeTab === "closed"
                         ? "flex justify-center"
                         : selectedPollObjects.length === 1
-                        ? "grid grid-cols-1 max-w-md"
-                        : selectedPollObjects.length === 2
-                        ? "grid grid-cols-2"
-                        : "grid grid-cols-3"
+                          ? "grid grid-cols-1 max-w-md"
+                          : selectedPollObjects.length === 2
+                            ? "grid grid-cols-2"
+                            : "grid grid-cols-3"
                     } gap-4`}
                   >
                     {selectedPollObjects.map((poll, index) =>
-                      renderChart(poll, index)
+                      renderChart(poll, index),
                     )}
                   </div>
                 </div>
@@ -770,9 +686,9 @@ export default function PollsScreen() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {(activeTab === "active"
-                        ? filteredPolls
-                        : currentClosedPolls
+                      {(activeTab === "DRAFT"
+                        ? filteredPolls || []
+                        : currentClosedPolls || []
                       ).map((poll) => (
                         <tr
                           key={poll.id}
@@ -791,10 +707,7 @@ export default function PollsScreen() {
                         >
                           <td className="px-4 py-2">
                             <div className="text-base font-medium text-black">
-                              {poll.title}
-                            </div>
-                            <div className="text-sm text-black font-medium">
-                              {poll.id}
+                              {poll.question}
                             </div>
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap">
@@ -813,7 +726,7 @@ export default function PollsScreen() {
                               className="text-base text-black font-medium"
                               suppressHydrationWarning={true}
                             >
-                              {new Date(poll.createdDate).toLocaleDateString()}
+                              {new Date(poll.createdOn).toLocaleDateString()}
                             </span>
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap">

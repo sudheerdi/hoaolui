@@ -15,21 +15,20 @@ export const hoaPollsApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    createPoll: builder.mutation<any, any>({
-      query: (params) => ({
-        url: "polls",
+    createPoll: builder.mutation<PollsRequestType, any>({
+      query: (requstData) => ({
+        url: "polls/with-options",
         method: "POST",
-        params,
+        body: requstData,
       }),
     }),
-    createPollOption: builder.mutation<any, any>({
-      query: (params) => ({
+    getPolls: builder.query<Poll[], void>({
+      query: () => ({
         url: "polls",
-        method: "POST",
-        params,
+        method: "GET",
       }),
     }),
   }),
 });
 
-export const { useCreatePollMutation } = hoaPollsApi;
+export const { useCreatePollMutation, useLazyGetPollsQuery } = hoaPollsApi;
