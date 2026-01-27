@@ -13,7 +13,7 @@ import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 interface SendViolationModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (e?: boolean) => void;
 }
 
 export default function SendViolationModal({
@@ -41,9 +41,8 @@ export default function SendViolationModal({
   const [showPDFPreview, setShowPDFPreview] = useState(false);
   const [timeObserved, setTimeObserved] = useState("");
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [description, setDescription] = useState(
-    "Date Observed: mm/dd/yyyy\nDescription: "
-  );
+  const [dateObserved, setDateObserved] = useState("");
+  const [description, setDescription] = useState("Description: ");
   const [vehicleDescription, setVehicleDescription] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
 
@@ -63,7 +62,7 @@ export default function SendViolationModal({
       membershipId: selectedUser.membershipId,
       type: selectedViolation?.violationType || "",
       dynamicValues: {
-        date: handleDateMatch(),
+        date: dateObserved,
         description: handleDescMatch(),
         violationPicture:
           uploadedImages.map((img) => URL.createObjectURL(img))[0] || "",
@@ -79,16 +78,16 @@ export default function SendViolationModal({
         setNotification({
           type: "success",
           message: `Violation notice sent to ${selectedUser.firstName} ${selectedUser.lastName} (${selectedUser.address1}) for ${selectedViolation?.violationType}`,
-        })
+        }),
       );
 
-      handleResetForm();
+      handleResetForm(true);
     } catch (error: any) {
       dispatch(
         setNotification({
           type: "error",
           message: error?.data?.error,
-        })
+        }),
       );
     }
   };
@@ -114,13 +113,6 @@ export default function SendViolationModal({
     setShowPDFPreview(false);
   };
 
-  const handleDateMatch = () => {
-    const dateMatch = description.match(
-      /Date Observed:\s*(\d{2}\/\d{2}\/\d{4})/
-    );
-    return dateMatch ? dateMatch[1] : "";
-  };
-
   const handleDescMatch = () => {
     const descMatch = description.match(/Description:\s*(.+)/);
     return descMatch ? descMatch[1].trim() : "";
@@ -137,7 +129,7 @@ export default function SendViolationModal({
       violationType: selectedViolation?.violationType || "",
       description: handleDescMatch(),
       ccrsSection: "",
-      dateObserved: handleDateMatch(),
+      dateObserved: dateObserved,
       timeObserved: timeObserved,
       reportedBy: "",
       evidence: uploadedImages,
@@ -163,20 +155,20 @@ export default function SendViolationModal({
         setNotification({
           type: "error",
           message: error ? error?.data.error : "Unable to fetch users data.",
-        })
+        }),
       );
     }
   };
 
-  const handleResetForm = () => {
-    onClose();
+  const handleResetForm = (submit?: boolean) => {
+    onClose(submit);
     setSelectedUser(null);
     setSelectedViolation(null);
     setUserSearchTerm("");
     setShowUserDropdown(false);
     setUploadedImages([]);
     setTimeObserved("");
-    setDescription("Date Observed: mm/dd/yyyy\nDescription: ");
+    setDescription("Description: ");
     setVehicleDescription("");
     setLicensePlate("");
   };
@@ -270,8 +262,8 @@ export default function SendViolationModal({
                           !selectedUser
                             ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
                             : selectedViolation?.violationType === violation.id
-                            ? "border-[#1FA372] bg-[#1FA372]/10"
-                            : "border-gray-200 bg-white hover:border-[#1FA372] hover:bg-gray-50"
+                              ? "border-[#1FA372] bg-[#1FA372]/10"
+                              : "border-gray-200 bg-white hover:border-[#1FA372] hover:bg-gray-50"
                         }`}
                       >
                         <div className="text-xl">
@@ -307,6 +299,18 @@ export default function SendViolationModal({
                         {selectedViolation.violationType}
                       </span>
                     </div>
+                  </div>
+
+                  <div className="w-64">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Date Observed
+                    </label>
+                    <input
+                      type="date"
+                      value={dateObserved}
+                      onChange={(e) => setDateObserved(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    />
                   </div>
 
                   <div>

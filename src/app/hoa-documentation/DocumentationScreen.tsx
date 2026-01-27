@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import React from "react";
-import Sidebar from "../../components/Sidebar";
+import { useLazyGetDocumenmtsQuery } from "@/src/services";
+import DashboardLayout from "@/src/components/layout/DashboardLayout";
 
 // Interface definitions
 interface Document {
@@ -37,13 +38,14 @@ interface Folder {
 }
 
 export default function DocumentationScreen() {
+  const [getDocuments, { data: documentsData }] = useLazyGetDocumenmtsQuery();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<string>("all");
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(
-    null
+    null,
   );
   const [sharePopover, setSharePopover] = useState<{
     isOpen: boolean;
@@ -437,7 +439,7 @@ export default function DocumentationScreen() {
     type: "folder" | "document",
     id: string,
     isPrivate: boolean,
-    event: React.MouseEvent
+    event: React.MouseEvent,
   ) => {
     if (!isPrivate) {
       const rect = (event.target as HTMLElement).getBoundingClientRect();
@@ -465,20 +467,20 @@ export default function DocumentationScreen() {
                 subfolders: folder.subfolders.map((subfolder) =>
                   subfolder.id === id
                     ? { ...subfolder, isPrivate, shareSettings: undefined }
-                    : subfolder
+                    : subfolder,
                 ),
               };
             }
             return folder;
-          })
+          }),
         );
       } else {
         setDocuments((prev) =>
           prev.map((doc) =>
             doc.id === id
               ? { ...doc, isPrivate, shareSettings: undefined }
-              : doc
-          )
+              : doc,
+          ),
         );
       }
     }
@@ -504,20 +506,20 @@ export default function DocumentationScreen() {
               subfolders: folder.subfolders.map((subfolder) =>
                 subfolder.id === sharePopover.item.id
                   ? { ...subfolder, isPrivate: false, shareSettings }
-                  : subfolder
+                  : subfolder,
               ),
             };
           }
           return folder;
-        })
+        }),
       );
     } else {
       setDocuments((prev) =>
         prev.map((doc) =>
           doc.id === sharePopover.item.id
             ? { ...doc, isPrivate: false, shareSettings }
-            : doc
-        )
+            : doc,
+        ),
       );
     }
 
@@ -543,7 +545,7 @@ export default function DocumentationScreen() {
         ? getAllDocuments()
         : getDocumentsForFolder(selectedFolder);
     return docs.filter((doc) =>
-      doc.name.toLowerCase().includes(searchTerm.toLowerCase())
+      doc.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [selectedFolder, searchTerm, documents]);
 
@@ -574,7 +576,7 @@ export default function DocumentationScreen() {
   const filteredEmailSuggestions = emailSuggestions.filter(
     (email) =>
       email.toLowerCase().includes(emailSearch.toLowerCase()) &&
-      !selectedEmails.includes(email)
+      !selectedEmails.includes(email),
   );
 
   const addEmail = (email: string) => {
@@ -588,10 +590,16 @@ export default function DocumentationScreen() {
     setSelectedEmails(selectedEmails.filter((e) => e !== email));
   };
 
-  return (
-    <div className="min-h-screen bg-[#1E293B] p-[10px]">
-      <Sidebar />
+  const handleGetDocuments = async () => {
+    await getDocuments(null);
+  };
 
+  useEffect(() => {
+    handleGetDocuments();
+  }, []);
+
+  return (
+    <DashboardLayout>
       <div className="lg:ml-[260px] bg-white rounded-lg h-[calc(100vh-20px)] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg flex-shrink-0">
@@ -734,7 +742,7 @@ export default function DocumentationScreen() {
                               "folder",
                               folder.id,
                               e.target.value === "private",
-                              e as any
+                              e as any,
                             )
                           }
                           className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
@@ -788,7 +796,7 @@ export default function DocumentationScreen() {
                                       "folder",
                                       subfolder.id,
                                       e.target.value === "private",
-                                      e as any
+                                      e as any,
                                     )
                                   }
                                   className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
@@ -906,7 +914,7 @@ export default function DocumentationScreen() {
                                 "document",
                                 doc.id,
                                 e.target.value === "private",
-                                e as any
+                                e as any,
                               )
                             }
                             className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
@@ -1052,6 +1060,6 @@ export default function DocumentationScreen() {
           </div>
         </>
       )}
-    </div>
+    </DashboardLayout>
   );
 }

@@ -12,7 +12,7 @@ export default function ViolationsScreen() {
   const dispatch = useAppDispatch();
   const [getViolations, { data: violationsData }] = useLazyGetViolationsQuery();
   const [selectedViolation, setSelectedViolation] = useState<Violation | null>(
-    null
+    null,
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("OPEN");
@@ -20,7 +20,7 @@ export default function ViolationsScreen() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [showSendViolationModal, setShowSendViolationModal] = useState(false);
   const [filteredViolations, setFilteredViolations] = useState(
-    Array<Violation>
+    Array<Violation>,
   );
   const [totalPages, setTotalPages] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
@@ -74,11 +74,11 @@ export default function ViolationsScreen() {
       setEndIndex(startIndex + rowsPerPage);
       const currentViolations = violations.slice(
         startIndex,
-        startIndex + rowsPerPage
+        startIndex + rowsPerPage,
       );
       setCurrentViolations(currentViolations);
       const openViolationsCount = violations.filter(
-        (v) => v.status === "OPEN"
+        (v) => v.status === "OPEN",
       ).length;
       setOpenViolationsCount(openViolationsCount);
       setResolvedViolationsCount(violations.length - openViolationsCount);
@@ -87,7 +87,7 @@ export default function ViolationsScreen() {
         setNotification({
           type: "error",
           message: error?.data.error || "Unable to load violations",
-        })
+        }),
       );
     }
   };
@@ -108,14 +108,12 @@ export default function ViolationsScreen() {
         violation.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
         violation.id.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" || violation.status === statusFilter;
+      const matchesStatus = violation.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
+      return searchTerm === "" ? matchesStatus : matchesSearch && matchesStatus;
     });
-
     setFilteredViolations(filteredViolations);
-  }, [searchTerm, currentViolations]);
+  }, [searchTerm, currentViolations, statusFilter]);
 
   return (
     <DashboardLayout>
@@ -258,7 +256,7 @@ export default function ViolationsScreen() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {currentViolations?.length === 0 ? (
+                        {filteredViolations?.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="px-6 py-12 text-center">
                               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -273,7 +271,7 @@ export default function ViolationsScreen() {
                             </td>
                           </tr>
                         ) : (
-                          currentViolations?.map((violation) => (
+                          filteredViolations?.map((violation) => (
                             <tr
                               key={violation.id}
                               className={`hover:bg-gray-50 transition-colors cursor-pointer ${
@@ -313,7 +311,7 @@ export default function ViolationsScreen() {
                                   suppressHydrationWarning={true}
                                 >
                                   {new Date(
-                                    violation.createdAt
+                                    violation.createdAt,
                                   ).toLocaleDateString()}
                                 </div>
                               </td>
@@ -386,7 +384,10 @@ export default function ViolationsScreen() {
       {/* Send Violation Modal */}
       <SendViolationModal
         isOpen={showSendViolationModal}
-        onClose={() => setShowSendViolationModal(false)}
+        onClose={(e) => {
+          setShowSendViolationModal(false);
+          if (e) handleGetAllViolations();
+        }}
       />
     </DashboardLayout>
   );
