@@ -2,24 +2,13 @@
 
 import { useState, useMemo, useEffect } from "react";
 import React from "react";
-import { useLazyGetDocumenmtsQuery } from "@/src/services";
+import {
+  useLazyGetDocumenmtsQuery,
+  useUploadDocumentMutation,
+} from "@/src/services";
 import DashboardLayout from "@/src/components/layout/DashboardLayout";
-
-// Interface definitions
-interface Document {
-  id: string;
-  name: string;
-  type: "PDF" | "DOC" | "IMG" | "XLS";
-  size: string;
-  uploadDate: string;
-  uploadedBy: string;
-  folderId: string;
-  isPrivate: boolean;
-  shareSettings?: {
-    shareType: "everyone" | "specific";
-    specificEmails?: string[];
-  };
-}
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
+import { useAppDispatch } from "@/src/lib/hooks";
 
 interface Folder {
   id: string;
@@ -38,13 +27,16 @@ interface Folder {
 }
 
 export default function DocumentationScreen() {
+  const dispatch = useAppDispatch();
   const [getDocuments, { data: documentsData }] = useLazyGetDocumenmtsQuery();
+  const [uploadDocument, { isLoading: isUploading }] =
+    useUploadDocumentMutation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<string>("all");
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
     new Set(),
   );
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
+  const [selectedDocument, setSelectedDocument] = useState<HoaDocument | null>(
     null,
   );
   const [sharePopover, setSharePopover] = useState<{
@@ -275,108 +267,7 @@ export default function DocumentationScreen() {
     },
   ]);
 
-  const [documents, setDocuments] = useState<Document[]>([
-    {
-      id: "ma1",
-      name: "Board Meeting Agenda - January 2024",
-      type: "PDF",
-      size: "1.2 MB",
-      uploadDate: "Jan 20, 2024",
-      uploadedBy: "Admin",
-      folderId: "meeting-agenda",
-      isPrivate: true,
-    },
-    {
-      id: "ma2",
-      name: "Annual Meeting Minutes",
-      type: "DOC",
-      size: "856 KB",
-      uploadDate: "Jan 18, 2024",
-      uploadedBy: "Sarah Johnson",
-      folderId: "meeting-agenda",
-      isPrivate: true,
-    },
-    {
-      id: "rv1",
-      name: "Violation Report Template",
-      type: "PDF",
-      size: "642 KB",
-      uploadDate: "Jan 15, 2024",
-      uploadedBy: "Michael Chen",
-      folderId: "requests",
-      isPrivate: true,
-    },
-    {
-      id: "rv2",
-      name: "Maintenance Request Form",
-      type: "DOC",
-      size: "324 KB",
-      uploadDate: "Jan 12, 2024",
-      uploadedBy: "Lisa Anderson",
-      folderId: "violations",
-      isPrivate: true,
-    },
-    {
-      id: "ad1",
-      name: "Policy Updates 2024",
-      type: "PDF",
-      size: "1.8 MB",
-      uploadDate: "Jan 10, 2024",
-      uploadedBy: "Emily Davis",
-      folderId: "ccr-bylaws",
-      isPrivate: true,
-    },
-    {
-      id: "ad2",
-      name: "Community Guidelines",
-      type: "DOC",
-      size: "756 KB",
-      uploadDate: "Jan 8, 2024",
-      uploadedBy: "Robert Wilson",
-      folderId: "amendments",
-      isPrivate: true,
-    },
-    {
-      id: "fi1",
-      name: "Budget Report 2024",
-      type: "XLS",
-      size: "2.1 MB",
-      uploadDate: "Jan 5, 2024",
-      uploadedBy: "Sarah Johnson",
-      folderId: "fiscal-budget",
-      isPrivate: true,
-    },
-    {
-      id: "fi2",
-      name: "Monthly Financial Statement",
-      type: "PDF",
-      size: "892 KB",
-      uploadDate: "Jan 3, 2024",
-      uploadedBy: "Admin",
-      folderId: "monthly-financial",
-      isPrivate: true,
-    },
-    {
-      id: "fo1",
-      name: "HOA Registration Form",
-      type: "PDF",
-      size: "456 KB",
-      uploadDate: "Dec 28, 2023",
-      uploadedBy: "Michael Chen",
-      folderId: "arch-documents",
-      isPrivate: true,
-    },
-    {
-      id: "fo2",
-      name: "Pet Registration Form",
-      type: "DOC",
-      size: "234 KB",
-      uploadDate: "Dec 25, 2023",
-      uploadedBy: "Lisa Anderson",
-      folderId: "insurance",
-      isPrivate: true,
-    },
-  ]);
+  const [documents, setDocuments] = useState<HoaDocument[]>([]);
 
   const toggleFolder = (folderId: string) => {
     const newExpanded = new Set(expandedFolders);
@@ -393,14 +284,14 @@ export default function DocumentationScreen() {
     setSelectedDocument(null);
   };
 
-  const getDocumentsForFolder = (folderId: string): Document[] => {
+  const getDocumentsForFolder = (folderId: string): HoaDocument[] => {
     if (folderId === "all") {
       return documents;
     }
-    return documents.filter((doc) => doc.folderId === folderId);
+    return documents.filter((doc) => doc.id === folderId);
   };
 
-  const getAllDocuments = (): Document[] => {
+  const getAllDocuments = (): HoaDocument[] => {
     return documents;
   };
 
@@ -431,7 +322,7 @@ export default function DocumentationScreen() {
     return "";
   };
 
-  const handleDocumentClick = (doc: Document) => {
+  const handleDocumentClick = (doc: HoaDocument) => {
     setSelectedDocument(doc);
   };
 
@@ -529,6 +420,14 @@ export default function DocumentationScreen() {
       item: null,
       position: { x: 0, y: 0 },
     });
+    setSelectedDocument((prev) =>
+      prev
+        ? {
+            ...prev,
+            visibility: "SHARED",
+          }
+        : null,
+    );
   };
 
   const deleteFolder = (folderId: string) => {
@@ -544,10 +443,13 @@ export default function DocumentationScreen() {
       selectedFolder === "all"
         ? getAllDocuments()
         : getDocumentsForFolder(selectedFolder);
-    return docs.filter((doc) =>
-      doc.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [selectedFolder, searchTerm, documents]);
+    const sortedDocs = [...docs].reverse();
+    return searchTerm === ""
+      ? sortedDocs
+      : sortedDocs.filter((doc) =>
+          doc.title?.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+  }, [selectedFolder, searchTerm, documents, documentsData]);
 
   const getAllFoldersFlat = (): Folder[] => {
     const flatFolders: Folder[] = [];
@@ -591,7 +493,45 @@ export default function DocumentationScreen() {
   };
 
   const handleGetDocuments = async () => {
-    await getDocuments(null);
+    const data = await getDocuments(null).unwrap();
+    setDocuments(data);
+  };
+
+  const handleUploadFiles = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    try {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        Array.from(files).forEach(async (file) => {
+          const formData = new FormData();
+          formData.append("title", file.name);
+          formData.append("description", file.name);
+          formData.append("docType", file.type);
+          formData.append(
+            "visibility",
+            selectedDocument?.visibility || "PRIVATE",
+          );
+          formData.append("sharedMembershipIds", selectedEmails.join(","));
+          formData.append("file", file);
+          await uploadDocument(formData).unwrap();
+          await handleGetDocuments();
+          dispatch(
+            setNotification({
+              type: "success",
+              message: `File "${file.name}" uploaded successfully.`,
+            }),
+          );
+        });
+      }
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error.message || "Error uploading file.",
+        }),
+      );
+    }
   };
 
   useEffect(() => {
@@ -635,17 +575,24 @@ export default function DocumentationScreen() {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-black">Folders</h3>
                 <div className="flex space-x-2">
-                  <button
-                    disabled={selectedFolder === "all"}
+                  <input
+                    type="file"
+                    onChange={handleUploadFiles}
+                    className="hidden"
+                    id="file-upload"
+                    disabled={selectedFolder !== "all"}
+                  />
+                  <label
+                    htmlFor="file-upload"
                     className={`px-3 py-2 rounded-lg text-base font-semibold transition-colors whitespace-nowrap ${
-                      selectedFolder === "all"
+                      selectedFolder !== "all"
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-[#1FA372] text-white hover:bg-[#188f5f] transition-colors cursor-pointer"
                     }`}
                   >
                     <i className="ri-upload-line mr-2"></i>
                     Upload Files
-                  </button>
+                  </label>
                 </div>
               </div>
 
@@ -679,7 +626,7 @@ export default function DocumentationScreen() {
                     </span>
                   </div>
                   <div className="col-span-2 text-base font-medium text-black">
-                    {documents.length}
+                    {documents?.length}
                   </div>
                   <div className="col-span-2 text-base font-medium text-black">
                     -
@@ -726,7 +673,7 @@ export default function DocumentationScreen() {
                         </span>
                       </div>
                       <div className="col-span-2 text-base font-medium text-black">
-                        {getDocumentsForFolder(folder.id).length}
+                        {getDocumentsForFolder(folder?.id)?.length}
                       </div>
                       <div className="col-span-2 text-base font-medium text-black">
                         {folder.createdBy}
@@ -825,7 +772,7 @@ export default function DocumentationScreen() {
                     {getFolderName(selectedFolder)}
                   </h3>
                   <p className="text-base font-medium text-black">
-                    {filteredDocuments.length} files
+                    {filteredDocuments?.length} files
                   </p>
                 </div>
               </div>
@@ -856,7 +803,7 @@ export default function DocumentationScreen() {
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {filteredDocuments.map((doc) => {
-                    const iconData = getIcon(doc.type);
+                    const iconData = getIcon(doc.docType as any);
                     const isSelected = selectedDocument?.id === doc.id;
                     return (
                       <div
@@ -877,7 +824,7 @@ export default function DocumentationScreen() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="text-base font-semibold text-black truncate">
-                                {doc.name}
+                                {doc.title}
                               </h4>
                             </div>
                           </div>
@@ -898,17 +845,19 @@ export default function DocumentationScreen() {
                         >
                           <div>
                             <span className="font-semibold">Created:</span>{" "}
-                            {doc.uploadedBy}, {doc.uploadDate}
+                            {doc.uploadedBy.name}, {doc.uploadedAt}
                           </div>
                           <div>
                             <span className="font-semibold">Updated:</span>{" "}
-                            {doc.uploadedBy}, {doc.uploadDate}
+                            {doc.lastModifiedBy.name}, {doc.lastModifiedAt}
                           </div>
                         </div>
 
                         <div className="mt-2">
                           <select
-                            value={doc.isPrivate ? "private" : "public"}
+                            value={
+                              doc.visibility === "SHARED" ? "public" : "private"
+                            }
                             onChange={(e) =>
                               handlePrivacyChange(
                                 "document",
