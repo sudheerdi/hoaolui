@@ -33,8 +33,28 @@ export const hoaDocumentsApi = createApi({
         },
       }),
     }),
+    deleteDocument: builder.mutation<any, any>({
+      query: (docId) => ({
+        url: `documents/${docId}`,
+        method: "DELETE",
+      }),
+    }),
+    shareDocument: builder.mutation<any, any>({
+      query: ({ docId, memberIds }) => ({
+        url: `documents/${docId}/share`,
+        method: "PATCH",
+        body: [memberIds],
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    }),
   }),
 });
 
-export const { useLazyGetDocumenmtsQuery, useUploadDocumentMutation } =
-  hoaDocumentsApi;
+export const {
+  useLazyGetDocumenmtsQuery,
+  useUploadDocumentMutation,
+  useDeleteDocumentMutation,
+  useShareDocumentMutation,
+} = hoaDocumentsApi;

@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import React from "react";
 import {
+  useDeleteDocumentMutation,
   useLazyGetDocumenmtsQuery,
   useUploadDocumentMutation,
 } from "@/src/services";
@@ -14,6 +15,7 @@ interface Folder {
   id: string;
   name: string;
   icon: string;
+  filePath: string;
   parentId: string | null;
   documents?: Document[];
   subfolders?: Folder[];
@@ -31,6 +33,9 @@ export default function DocumentationScreen() {
   const [getDocuments, { data: documentsData }] = useLazyGetDocumenmtsQuery();
   const [uploadDocument, { isLoading: isUploading }] =
     useUploadDocumentMutation();
+  const [deleteHoaDocument, { isLoading: isDeleting }] =
+    useDeleteDocumentMutation();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<string>("all");
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
@@ -52,6 +57,7 @@ export default function DocumentationScreen() {
     {
       id: "meeting-agenda",
       name: "Meeting Agenda",
+      filePath: "meeting-agenda",
       icon: "ri-folder-fill",
       parentId: null,
       isPrivate: true,
@@ -62,6 +68,7 @@ export default function DocumentationScreen() {
     {
       id: "requests-violations",
       name: "Requests & Violations",
+      filePath: "requests-violations",
       icon: "ri-folder-fill",
       parentId: null,
       isPrivate: true,
@@ -71,6 +78,7 @@ export default function DocumentationScreen() {
         {
           id: "requests",
           name: "Requests",
+          filePath: "requests-violations/requests",
           icon: "ri-folder-fill",
           parentId: "requests-violations",
           isPrivate: true,
@@ -80,6 +88,7 @@ export default function DocumentationScreen() {
         {
           id: "violations",
           name: "Violations",
+          filePath: "requests-violations/violations",
           icon: "ri-folder-fill",
           parentId: "requests-violations",
           isPrivate: true,
@@ -91,6 +100,7 @@ export default function DocumentationScreen() {
     {
       id: "administrative",
       name: "Administrative",
+      filePath: "administrative",
       icon: "ri-folder-fill",
       parentId: null,
       isPrivate: true,
@@ -100,6 +110,7 @@ export default function DocumentationScreen() {
         {
           id: "ccr-bylaws",
           name: "CCR & ByLaws",
+          filePath: "administrative/ccr-bylaws",
           icon: "ri-folder-fill",
           parentId: "administrative",
           isPrivate: true,
@@ -109,6 +120,7 @@ export default function DocumentationScreen() {
         {
           id: "amendments",
           name: "Amendments",
+          filePath: "administrative/amendments",
           icon: "ri-folder-fill",
           parentId: "administrative",
           isPrivate: true,
@@ -118,6 +130,7 @@ export default function DocumentationScreen() {
         {
           id: "association-formation",
           name: "Association Formation Document",
+          filePath: "administrative/association-formation",
           icon: "ri-folder-fill",
           parentId: "administrative",
           isPrivate: true,
@@ -127,6 +140,7 @@ export default function DocumentationScreen() {
         {
           id: "master-deed",
           name: "Master Deed",
+          filePath: "administrative/master-deed",
           icon: "ri-folder-fill",
           parentId: "administrative",
           isPrivate: true,
@@ -136,6 +150,7 @@ export default function DocumentationScreen() {
         {
           id: "association-rules",
           name: "Association Rules and Regulations",
+          filePath: "administrative/association-rules",
           icon: "ri-folder-fill",
           parentId: "administrative",
           isPrivate: true,
@@ -145,6 +160,7 @@ export default function DocumentationScreen() {
         {
           id: "resolutions",
           name: "Resolutions",
+          filePath: "administrative/resolutions",
           icon: "ri-folder-fill",
           parentId: "administrative",
           isPrivate: true,
@@ -154,6 +170,7 @@ export default function DocumentationScreen() {
         {
           id: "policy",
           name: "Policy",
+          filePath: "administrative/policy",
           icon: "ri-folder-fill",
           parentId: "administrative",
           isPrivate: true,
@@ -165,6 +182,7 @@ export default function DocumentationScreen() {
     {
       id: "financial",
       name: "Financial",
+      filePath: "financial",
       icon: "ri-folder-fill",
       parentId: null,
       isPrivate: true,
@@ -174,6 +192,7 @@ export default function DocumentationScreen() {
         {
           id: "audit-fiscal",
           name: "Audit/Fiscal Review",
+          filePath: "financial/audit-fiscal",
           icon: "ri-folder-fill",
           parentId: "financial",
           isPrivate: true,
@@ -184,6 +203,7 @@ export default function DocumentationScreen() {
           id: "fiscal-budget",
           name: "Fiscal Budget",
           icon: "ri-folder-fill",
+          filePath: "financial/fiscal-budget",
           parentId: "financial",
           isPrivate: true,
           createdBy: "Emily Davis",
@@ -192,6 +212,7 @@ export default function DocumentationScreen() {
         {
           id: "misc-checks",
           name: "Misc Checks",
+          filePath: "financial/misc-checks",
           icon: "ri-folder-fill",
           parentId: "financial",
           isPrivate: true,
@@ -201,6 +222,7 @@ export default function DocumentationScreen() {
         {
           id: "monthly-financial",
           name: "Monthly Financial",
+          filePath: "financial/monthly-financial",
           icon: "ri-folder-fill",
           parentId: "financial",
           isPrivate: true,
@@ -210,6 +232,7 @@ export default function DocumentationScreen() {
         {
           id: "reserve-funds",
           name: "Reserve Funds",
+          filePath: "financial/reserve-funds",
           icon: "ri-folder-fill",
           parentId: "financial",
           isPrivate: true,
@@ -221,6 +244,7 @@ export default function DocumentationScreen() {
     {
       id: "forms",
       name: "Forms",
+      filePath: "forms",
       icon: "ri-folder-fill",
       parentId: null,
       isPrivate: true,
@@ -230,6 +254,7 @@ export default function DocumentationScreen() {
         {
           id: "arch-documents",
           name: "Arch Documents",
+          filePath: "forms/arch-documents",
           icon: "ri-folder-fill",
           parentId: "forms",
           isPrivate: true,
@@ -239,6 +264,7 @@ export default function DocumentationScreen() {
         {
           id: "insurance",
           name: "Insurance",
+          filePath: "forms/insurance",
           icon: "ri-folder-fill",
           parentId: "forms",
           isPrivate: true,
@@ -248,6 +274,7 @@ export default function DocumentationScreen() {
         {
           id: "lease",
           name: "Lease",
+          filePath: "forms/lease",
           icon: "ri-folder-fill",
           parentId: "forms",
           isPrivate: true,
@@ -257,6 +284,7 @@ export default function DocumentationScreen() {
         {
           id: "profile",
           name: "Profile",
+          filePath: "forms/profile",
           icon: "ri-folder-fill",
           parentId: "forms",
           isPrivate: true,
@@ -288,7 +316,7 @@ export default function DocumentationScreen() {
     if (folderId === "all") {
       return documents;
     }
-    return documents.filter((doc) => doc.id === folderId);
+    return documents.filter((doc) => doc.filePath.includes(`/${folderId}`));
   };
 
   const getAllDocuments = (): HoaDocument[] => {
@@ -315,7 +343,9 @@ export default function DocumentationScreen() {
     for (const folder of folders) {
       if (folder.id === folderId) return folder.name;
       if (folder.subfolders) {
-        const subfolder = folder.subfolders.find((sf) => sf.id === folderId);
+        const subfolder = folder.subfolders.find((sf) =>
+          folderId.includes(sf.filePath),
+        );
         if (subfolder) return subfolder.name;
       }
     }
@@ -434,8 +464,24 @@ export default function DocumentationScreen() {
     setFolders((prev) => prev.filter((folder) => folder.id !== folderId));
   };
 
-  const deleteDocument = (docId: string) => {
-    setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
+  const deleteDocument = async (docId: string) => {
+    try {
+      await deleteHoaDocument(docId).unwrap();
+      await handleGetDocuments();
+      dispatch(
+        setNotification({
+          type: "success",
+          message: "Document deleted successfully.",
+        }),
+      );
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error.message || "Error deleting document.",
+        }),
+      );
+    }
   };
 
   const filteredDocuments = useMemo(() => {
@@ -497,6 +543,15 @@ export default function DocumentationScreen() {
     setDocuments(data);
   };
 
+  const handleUploadButtonDisabled = () => {
+    const folder = folders.filter((f: Folder) => f.filePath === selectedFolder);
+    return (
+      selectedFolder === "all" ||
+      (folder[0]?.subfolders?.length || 0) > 0 ||
+      isUploading
+    );
+  };
+
   const handleUploadFiles = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -514,6 +569,7 @@ export default function DocumentationScreen() {
           );
           formData.append("sharedMembershipIds", selectedEmails.join(","));
           formData.append("file", file);
+          formData.append("filePath", selectedFolder);
           await uploadDocument(formData).unwrap();
           await handleGetDocuments();
           dispatch(
@@ -580,12 +636,12 @@ export default function DocumentationScreen() {
                     onChange={handleUploadFiles}
                     className="hidden"
                     id="file-upload"
-                    disabled={selectedFolder !== "all"}
+                    disabled={handleUploadButtonDisabled()}
                   />
                   <label
                     htmlFor="file-upload"
                     className={`px-3 py-2 rounded-lg text-base font-semibold transition-colors whitespace-nowrap ${
-                      selectedFolder !== "all"
+                      selectedFolder === "all" || handleUploadButtonDisabled()
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-[#1FA372] text-white hover:bg-[#188f5f] transition-colors cursor-pointer"
                     }`}
@@ -641,14 +697,14 @@ export default function DocumentationScreen() {
                   <div key={folder.id}>
                     <div
                       className={`grid grid-cols-12 gap-4 items-center p-3 rounded-lg cursor-pointer transition-colors border ${
-                        selectedFolder === folder.id
+                        selectedFolder === folder.filePath
                           ? "bg-green-50 border-green-200"
                           : "hover:bg-gray-50 border-transparent"
                       }`}
                     >
                       <div
                         className="col-span-3 flex items-center space-x-3"
-                        onClick={() => setSelectedFolder(folder.id)}
+                        onClick={() => handleFolderClick(folder.filePath)}
                       >
                         {folder.subfolders && folder.subfolders.length > 0 && (
                           <button
@@ -710,14 +766,16 @@ export default function DocumentationScreen() {
                             <div
                               key={subfolder.id}
                               className={`grid grid-cols-12 gap-4 items-center p-3 rounded-lg cursor-pointer transition-colors border ${
-                                selectedFolder === subfolder.id
+                                selectedFolder === subfolder.filePath
                                   ? "bg-green-50 border-green-200"
                                   : "hover:bg-gray-50 border-transparent"
                               }`}
                             >
                               <div
                                 className="col-span-3 flex items-center space-x-3"
-                                onClick={() => setSelectedFolder(subfolder.id)}
+                                onClick={() =>
+                                  handleFolderClick(subfolder.filePath)
+                                }
                               >
                                 <i className="ri-folder-line text-black text-lg"></i>
                                 <span className="font-semibold text-black text-base">

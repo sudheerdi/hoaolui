@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useShareDocumentMutation } from "@/src/services/hoa-documents";
+import { useAppDispatch } from "@/src/lib/hooks";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -13,6 +16,10 @@ export default function ShareModal({
   onClose,
   documentName,
 }: ShareModalProps) {
+  const dispatch = useAppDispatch();
+  const [shareHoaDocument, { isLoading: isSharing }] =
+    useShareDocumentMutation();
+
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [shareLink, setShareLink] = useState("");
 
@@ -45,19 +52,43 @@ export default function ShareModal({
     setSelectedUsers((prev) =>
       prev.includes(userId)
         ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+        : [...prev, userId],
     );
   };
 
   const generateShareLink = () => {
     setShareLink(
       "https://communityconnect.com/share/doc-" +
-        Math.random().toString(36).substr(2, 9)
+        Math.random().toString(36).substr(2, 9),
     );
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareLink);
+  };
+
+  const handleShare = async () => {
+    debugger;
+    try {
+      await shareHoaDocument({
+        docId: documentName,
+        memberIds: selectedUsers,
+      }).unwrap();
+      dispatch(
+        setNotification({
+          type: "success",
+          message: "Document shared successfully.",
+        }),
+      );
+      onClose();
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error.message || "Error sharing document.",
+        }),
+      );
+    }
   };
 
   return (
@@ -152,7 +183,7 @@ export default function ShareModal({
             Cancel
           </button>
           <button
-            onClick={onClose}
+            onClick={handleShare}
             disabled={selectedUsers.length === 0 && !shareLink}
             className="px-6 py-2.5 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
           >
