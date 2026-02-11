@@ -43,7 +43,7 @@ export const hoaDocumentsApi = createApi({
       query: ({ docId, memberIds }) => ({
         url: `documents/${docId}/share`,
         method: "PATCH",
-        body: [memberIds],
+        body: memberIds,
         headers: {
           "Content-Type": "application/json",
         },

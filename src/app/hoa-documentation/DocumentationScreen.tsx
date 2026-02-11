@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import React from "react";
 import {
   useDeleteDocumentMutation,
   useLazyGetDocumenmtsQuery,
+  useLazyGetUnitsQuery,
+  useShareDocumentMutation,
   useUploadDocumentMutation,
 } from "@/src/services";
 import DashboardLayout from "@/src/components/layout/DashboardLayout";
@@ -35,6 +37,9 @@ export default function DocumentationScreen() {
     useUploadDocumentMutation();
   const [deleteHoaDocument, { isLoading: isDeleting }] =
     useDeleteDocumentMutation();
+  const [shareHoaDocument, { isLoading: isSharing }] =
+    useShareDocumentMutation();
+  const [getUnits, { data: unitsData }] = useLazyGetUnitsQuery();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<string>("all");
@@ -52,6 +57,10 @@ export default function DocumentationScreen() {
   }>({ isOpen: false, type: "folder", item: null, position: { x: 0, y: 0 } });
   const [emailSearch, setEmailSearch] = useState("");
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [filteredEmailSuggestions, setFilteredEmailSuggestions] = useState<
+    string[]
+  >([]);
+  const [shareWithEveryone, setShareWithEveryone] = useState(false);
 
   const [folders, setFolders] = useState<Folder[]>([
     {
@@ -407,7 +416,41 @@ export default function DocumentationScreen() {
     }
   };
 
+  const handleShareApi = async (shareType: "everyone" | "specific") => {
+    if (!sharePopover.item || sharePopover.type === "folder") return;
+    let allUsers: string[] = [];
+    let selectedUsers: string[] = [];
+    if (unitsData && unitsData.units) {
+      allUsers = unitsData.units.map(
+        (unit: any) => unit.owners[0].userId || "",
+      );
+      selectedUsers = unitsData.units
+        .filter((unit: any) => selectedEmails.includes(unit.owners[0].emailId))
+        .map((unit: any) => unit.owners[0].userId || "");
+    }
+    try {
+      await shareHoaDocument({
+        docId: sharePopover.item.id,
+        memberIds: shareType === "specific" ? selectedUsers : allUsers,
+      }).unwrap();
+      dispatch(
+        setNotification({
+          type: "success",
+          message: "Document shared successfully.",
+        }),
+      );
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message: error.message || "Error sharing document.",
+        }),
+      );
+    }
+  };
+
   const handleShareSettingsChange = (shareType: "everyone" | "specific") => {
+    setShareWithEveryone(shareType === "everyone");
     if (!sharePopover.item) return;
 
     const shareSettings = {
@@ -416,6 +459,10 @@ export default function DocumentationScreen() {
     };
 
     if (sharePopover.type === "folder") {
+      debugger;
+      const allUsers =
+        unitsData?.units.map((unit: any) => unit.owners[0].userId || "") || [];
+      debugger;
       setFolders((prev) =>
         prev.map((folder) => {
           if (folder.id === sharePopover.item.id) {
@@ -458,6 +505,7 @@ export default function DocumentationScreen() {
           }
         : null,
     );
+    handleShareApi(shareType);
   };
 
   const deleteFolder = (folderId: string) => {
@@ -508,24 +556,16 @@ export default function DocumentationScreen() {
     return flatFolders;
   };
 
-  const emailSuggestions = [
-    "john.doe@email.com",
-    "sarah.johnson@email.com",
-    "michael.chen@email.com",
-    "lisa.anderson@email.com",
-    "robert.wilson@email.com",
-    "emily.davis@email.com",
-    "admin@community.com",
-    "manager@hoa.com",
-    "board@community.org",
-    "secretary@hoa.com",
-  ];
-
-  const filteredEmailSuggestions = emailSuggestions.filter(
-    (email) =>
-      email.toLowerCase().includes(emailSearch.toLowerCase()) &&
-      !selectedEmails.includes(email),
-  );
+  useEffect(() => {
+    const emailSuggestions =
+      unitsData?.units.map((unit: any) => unit.owners[0].emailId || "") || [];
+    const filtered = emailSuggestions.filter(
+      (email: string) =>
+        email.toLowerCase().includes(emailSearch.toLowerCase()) &&
+        !selectedEmails.includes(email),
+    );
+    setFilteredEmailSuggestions(filtered);
+  }, [unitsData, emailSearch, selectedEmails]);
 
   const addEmail = (email: string) => {
     if (selectedEmails.length < 10 && !selectedEmails.includes(email)) {
@@ -592,6 +632,7 @@ export default function DocumentationScreen() {
 
   useEffect(() => {
     handleGetDocuments();
+    getUnits(null);
   }, []);
 
   return (
@@ -987,6 +1028,7 @@ export default function DocumentationScreen() {
                     name="shareType"
                     value="specific"
                     className="mr-2"
+                    onChange={() => setShareWithEveryone(false)}
                   />
                   <span className="text-base font-medium text-black">
                     Share with specific people
@@ -998,21 +1040,24 @@ export default function DocumentationScreen() {
                     <input
                       type="text"
                       placeholder="Search emails..."
+                      disabled={shareWithEveryone}
                       value={emailSearch}
                       onChange={(e) => setEmailSearch(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base font-medium text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     {emailSearch && filteredEmailSuggestions.length > 0 && (
                       <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-32 overflow-y-auto z-10">
-                        {filteredEmailSuggestions.slice(0, 5).map((email) => (
-                          <button
-                            key={email}
-                            onClick={() => addEmail(email)}
-                            className="w-full px-3 py-2 text-left text-base font-medium text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                          >
-                            {email}
-                          </button>
-                        ))}
+                        {filteredEmailSuggestions
+                          .slice(0, 5)
+                          .map((email: string) => (
+                            <button
+                              key={email}
+                              onClick={() => addEmail(email)}
+                              className="w-full px-3 py-2 text-left text-base font-medium text-black hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            >
+                              {email}
+                            </button>
+                          ))}
                       </div>
                     )}
                   </div>
