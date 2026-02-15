@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
+import DashboardLayout from "@/src/components/layout/DashboardLayout";
+import { useLazyGetViolationDefaultsQuery } from "@/src/services/hoa-violations";
 
 type TabType =
   | "violation-schedule"
@@ -54,11 +56,17 @@ interface NotificationSetting {
 }
 
 export default function ConfigurationScreen() {
+  const [
+    getViolationDefaults,
+    { data: defaultViolationsData, isLoading: isLoadingViolationsDefaults },
+  ] = useLazyGetViolationDefaultsQuery();
+
   const [activeTab, setActiveTab] = useState<TabType>("violation-schedule");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   const [violationRecords, setViolationRecords] = useState<ViolationRecord[]>(
-    []
+    [],
   );
   const sampleViolations: ViolationRecord[] = [
     {
@@ -563,20 +571,20 @@ export default function ConfigurationScreen() {
           (r) =>
             r.type === violation?.type &&
             r.compliancePeriod === violation?.compliancePeriod &&
-            r.fine === violation?.fine
+            r.fine === violation?.fine,
         );
       case "escalation-policy":
         const escalation = sampleEscalations.find((e) => e.id === sampleId);
         return escalationRecords.some(
           (r) =>
             r.noticeNumber === escalation?.noticeNumber &&
-            r.action === escalation?.action
+            r.action === escalation?.action,
         );
       case "amenities-reservations":
         const amenity = sampleAmenities.find((a) => a.id === sampleId);
         return amenityRecords.some(
           (r) =>
-            r.type === amenity?.type && r.typicalFee === amenity?.typicalFee
+            r.type === amenity?.type && r.typicalFee === amenity?.typicalFee,
         );
       default:
         return false;
@@ -587,17 +595,17 @@ export default function ConfigurationScreen() {
     switch (activeTab) {
       case "violation-schedule":
         setViolationRecords((prev) =>
-          prev.map((item) => ({ ...item, isEditing: false }))
+          prev.map((item) => ({ ...item, isEditing: false })),
         );
         break;
       case "escalation-policy":
         setEscalationRecords((prev) =>
-          prev.map((item) => ({ ...item, isEditing: false }))
+          prev.map((item) => ({ ...item, isEditing: false })),
         );
         break;
       case "amenities-reservations":
         setAmenityRecords((prev) =>
-          prev.map((item) => ({ ...item, isEditing: false }))
+          prev.map((item) => ({ ...item, isEditing: false })),
         );
         break;
     }
@@ -608,22 +616,22 @@ export default function ConfigurationScreen() {
       case "violation-schedule":
         setViolationRecords((prev) =>
           prev.map((item) =>
-            item.id === id ? { ...item, isEditing: true } : item
-          )
+            item.id === id ? { ...item, isEditing: true } : item,
+          ),
         );
         break;
       case "escalation-policy":
         setEscalationRecords((prev) =>
           prev.map((item) =>
-            item.id === id ? { ...item, isEditing: true } : item
-          )
+            item.id === id ? { ...item, isEditing: true } : item,
+          ),
         );
         break;
       case "amenities-reservations":
         setAmenityRecords((prev) =>
           prev.map((item) =>
-            item.id === id ? { ...item, isEditing: true } : item
-          )
+            item.id === id ? { ...item, isEditing: true } : item,
+          ),
         );
         break;
     }
@@ -633,17 +641,17 @@ export default function ConfigurationScreen() {
     switch (activeTab) {
       case "violation-schedule":
         setViolationRecords((prev) =>
-          prev.filter((item) => !selectedRows.includes(item.id))
+          prev.filter((item) => !selectedRows.includes(item.id)),
         );
         break;
       case "escalation-policy":
         setEscalationRecords((prev) =>
-          prev.filter((item) => !selectedRows.includes(item.id))
+          prev.filter((item) => !selectedRows.includes(item.id)),
         );
         break;
       case "amenities-reservations":
         setAmenityRecords((prev) =>
-          prev.filter((item) => !selectedRows.includes(item.id))
+          prev.filter((item) => !selectedRows.includes(item.id)),
         );
         break;
     }
@@ -652,7 +660,7 @@ export default function ConfigurationScreen() {
 
   const handleRowSelect = (id: string) => {
     setSelectedRows((prev) =>
-      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id],
     );
   };
 
@@ -661,22 +669,22 @@ export default function ConfigurationScreen() {
       case "violation-schedule":
         setViolationRecords((prev) =>
           prev.map((item) =>
-            item.id === id ? { ...item, [field]: value } : item
-          )
+            item.id === id ? { ...item, [field]: value } : item,
+          ),
         );
         break;
       case "escalation-policy":
         setEscalationRecords((prev) =>
           prev.map((item) =>
-            item.id === id ? { ...item, [field]: value } : item
-          )
+            item.id === id ? { ...item, [field]: value } : item,
+          ),
         );
         break;
       case "amenities-reservations":
         setAmenityRecords((prev) =>
           prev.map((item) =>
-            item.id === id ? { ...item, [field]: value } : item
-          )
+            item.id === id ? { ...item, [field]: value } : item,
+          ),
         );
         break;
     }
@@ -685,14 +693,14 @@ export default function ConfigurationScreen() {
   const handleNotificationToggle = (id: string) => {
     setNotificationSettings((prev) =>
       prev.map((setting) =>
-        setting.id === id ? { ...setting, enabled: !setting.enabled } : setting
-      )
+        setting.id === id ? { ...setting, enabled: !setting.enabled } : setting,
+      ),
     );
   };
 
   const renderViolationTable = (
     records: ViolationRecord[],
-    isEditable: boolean = false
+    isEditable: boolean = false,
   ) => (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -721,43 +729,43 @@ export default function ConfigurationScreen() {
             )}
             <th
               className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "15%" }}
+              style={{ color: "#000000" }}
             >
               Type
             </th>
             <th
               className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "10%" }}
+              style={{ color: "#000000" }}
             >
               Compliance Period (Days)
             </th>
             <th
               className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "10%" }}
+              style={{ color: "#000000" }}
             >
               Response Period (Appeal)
             </th>
             <th
               className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "8%" }}
+              style={{ color: "#000000" }}
             >
               Fine ($)
             </th>
             <th
               className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "10%" }}
+              style={{ color: "#000000" }}
             >
               Interest Rate (If No Response)
             </th>
             <th
               className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "15%" }}
+              style={{ color: "#000000" }}
             >
               Late Fee Policy
             </th>
             <th
               className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider"
-              style={{ color: "#000000", width: "20%" }}
+              style={{ color: "#000000" }}
             >
               Notes
             </th>
@@ -793,14 +801,26 @@ export default function ConfigurationScreen() {
                 )}
                 <td className="px-4 py-4 text-sm font-medium text-gray-900 border-r border-gray-200">
                   {record.isEditing ? (
-                    <input
-                      type="text"
+                    <select
                       value={record.type}
                       onChange={(e) =>
                         handleFieldChange(record.id, "type", e.target.value)
                       }
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                      className="w-full px-3 py-2 text-base font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer pr-8"
+                    >
+                      <option value="">Choose a violation...</option>
+                      {defaultViolationsData &&
+                        defaultViolationsData.violationDefaults.map(
+                          (violation) => (
+                            <option
+                              key={violation.id}
+                              value={violation.violationType}
+                            >
+                              {violation.violationType}
+                            </option>
+                          ),
+                        )}
+                    </select>
                   ) : (
                     record.type
                   )}
@@ -814,7 +834,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "compliancePeriod",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -832,7 +852,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "responsePeriod",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -864,7 +884,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "interestRate",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -882,7 +902,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "lateFeePolicy",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -915,7 +935,7 @@ export default function ConfigurationScreen() {
 
   const renderEscalationTable = (
     records: EscalationRecord[],
-    isEditable: boolean = false
+    isEditable: boolean = false,
   ) => (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -1001,7 +1021,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "noticeNumber",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1032,7 +1052,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "calculation",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
@@ -1052,7 +1072,7 @@ export default function ConfigurationScreen() {
 
   const renderAmenityTable = (
     records: AmenityRecord[],
-    isEditable: boolean = false
+    isEditable: boolean = false,
   ) => (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -1156,7 +1176,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "typicalFee",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1174,7 +1194,7 @@ export default function ConfigurationScreen() {
                         handleFieldChange(
                           record.id,
                           "refundable",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1305,10 +1325,12 @@ export default function ConfigurationScreen() {
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-[#0A1823] flex">
-      <Sidebar />
+  useEffect(() => {
+    getViolationDefaults(null);
+  }, []);
 
+  return (
+    <DashboardLayout>
       <div className="ml-[260px] flex-1 p-[10px]">
         <div className="bg-white rounded-lg h-[calc(100vh-20px)] flex flex-col overflow-hidden">
           <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg flex-shrink-0">
@@ -1340,12 +1362,12 @@ export default function ConfigurationScreen() {
           </div>
 
           <div className="p-6 space-y-6 flex-1 overflow-y-auto">
-            <div className="flex space-x-2 flex-shrink-0">
+            <div className="flex flex-shrink-0">
               <button
                 onClick={() => setActiveTab("violation-schedule")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+                className={`relative px-4 py-2 text-sm font-medium rounded-tl-lg rounded-bl-lg transition-colors cursor-pointer whitespace-nowrap ${
                   activeTab === "violation-schedule"
-                    ? "text-white"
+                    ? "text-white after:content-[''] after:w-2 after:h-2 after:bottom-[-4px] after:left-[50%] after:absolute after:bg-[#1FA372] after:rotate-45"
                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
                 style={
@@ -1358,9 +1380,9 @@ export default function ConfigurationScreen() {
               </button>
               <button
                 onClick={() => setActiveTab("escalation-policy")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+                className={`relative px-4 py-2 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${
                   activeTab === "escalation-policy"
-                    ? "text-white"
+                    ? "text-white after:content-[''] after:w-2 after:h-2 after:bottom-[-4px] after:left-[50%] after:absolute after:bg-[#1FA372] after:rotate-45"
                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
                 style={
@@ -1373,10 +1395,10 @@ export default function ConfigurationScreen() {
               </button>
               <button
                 onClick={() => setActiveTab("amenities-reservations")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+                className={`relative px-4 py-2 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${
                   activeTab === "amenities-reservations"
-                    ? "text-white"
-                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                    ? "text-white after:content-[''] after:w-2 after:h-2 after:bottom-[-4px] after:left-[50%] after:absolute after:bg-[#1FA372] after:rotate-45"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 "
                 }`}
                 style={
                   activeTab === "amenities-reservations"
@@ -1388,9 +1410,9 @@ export default function ConfigurationScreen() {
               </button>
               <button
                 onClick={() => setActiveTab("notification-settings")}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+                className={`relative px-4 py-2 text-sm font-medium rounded-tr-lg rounded-br-lg transition-colors cursor-pointer whitespace-nowrap ${
                   activeTab === "notification-settings"
-                    ? "text-white"
+                    ? "text-white after:content-[''] after:w-2 after:h-2 after:bottom-[-4px] after:left-[50%] after:absolute after:bg-[#1FA372] after:rotate-45"
                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
                 style={
@@ -1501,7 +1523,7 @@ export default function ConfigurationScreen() {
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-medium text-gray-900">
                       {activeTab === "violation-schedule" &&
-                        "Violation & Late Fee Schedule (Sample - for reference only) - Please refere your Bylaws and add"}
+                        "Sample Records - for reference only"}
                       {activeTab === "escalation-policy" &&
                         "Violation & Dues Late Payment Escalation Policy (Sample - for reference only) - Please refere your Bylaws and add"}
                       {activeTab === "amenities-reservations" &&
@@ -1509,275 +1531,285 @@ export default function ConfigurationScreen() {
                     </h2>
                     <div className="flex items-center space-x-4">
                       <button
-                        className="px-4 py-2 text-white text-sm font-medium rounded-md whitespace-nowrap cursor-pointer"
-                        style={{ backgroundColor: "#1FA372" }}
+                        onClick={() => setShowTemplates(!showTemplates)}
+                        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                       >
-                        Sample
+                        <div className="w-5 h-5 flex items-center justify-center">
+                          <i
+                            className={`ri-arrow-${
+                              showTemplates ? "up" : "down"
+                            }-s-line text-gray-600 text-2xl`}
+                          ></i>
+                        </div>
                       </button>
                     </div>
                   </div>
                 </div>
-
-                <div className="overflow-y-auto flex-1">
-                  <div>
-                    {activeTab === "violation-schedule" && (
-                      <table className="w-full">
-                        <thead style={{ backgroundColor: "#DCDCDC" }}>
-                          <tr>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "15%" }}
-                            >
-                              Type
-                            </th>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "10%" }}
-                            >
-                              Compliance Period (Days)
-                            </th>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "10%" }}
-                            >
-                              Response Period (Appeal)
-                            </th>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "8%" }}
-                            >
-                              Fine ($)
-                            </th>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "10%" }}
-                            >
-                              Interest Rate (If No Response)
-                            </th>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "15%" }}
-                            >
-                              Late Fee Policy
-                            </th>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "20%" }}
-                            >
-                              Notes
-                            </th>
-                            <th
-                              className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider"
-                              style={{ color: "#000000", width: "8%" }}
-                            >
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {sampleViolations.map((violation) => (
-                            <tr key={violation.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-4 text-base font-medium text-black border-r border-gray-200">
-                                {violation.type}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {violation.compliancePeriod}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {violation.responsePeriod}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {violation.fine}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {violation.interestRate}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {violation.lateFeePolicy}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {violation.notes}
-                              </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black">
-                                <button
-                                  onClick={() =>
-                                    handleAddFromSample(violation.id)
-                                  }
-                                  disabled={isSampleAdded(violation.id)}
-                                  className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap cursor-pointer ${
-                                    isSampleAdded(violation.id)
-                                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                      : "text-white"
-                                  }`}
-                                  style={
-                                    !isSampleAdded(violation.id)
-                                      ? { backgroundColor: "#1FA372" }
-                                      : {}
-                                  }
-                                >
-                                  Add
-                                </button>
-                              </td>
+                {showTemplates && (
+                  <div className="overflow-y-auto flex-1">
+                    <div>
+                      {activeTab === "violation-schedule" && (
+                        <table className="w-full">
+                          <thead style={{ backgroundColor: "#DCDCDC" }}>
+                            <tr>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000" }}
+                              >
+                                Type
+                              </th>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000" }}
+                              >
+                                Compliance Period (Days)
+                              </th>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000" }}
+                              >
+                                Response Period (Appeal)
+                              </th>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000" }}
+                              >
+                                Fine ($)
+                              </th>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000" }}
+                              >
+                                Interest Rate (If No Response)
+                              </th>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000" }}
+                              >
+                                Late Fee Policy
+                              </th>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000" }}
+                              >
+                                Notes
+                              </th>
+                              <th
+                                className="px-4 py-3 text-left text-sm font-bold uppercase tracking-wider"
+                                style={{ color: "#000000" }}
+                              >
+                                Action
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {sampleViolations.map((violation) => (
+                              <tr
+                                key={violation.id}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="px-4 py-4 text-base font-medium text-black border-r border-gray-200">
+                                  {violation.type}
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
+                                  {violation.compliancePeriod}
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
+                                  {violation.responsePeriod}
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
+                                  {violation.fine}
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
+                                  {violation.interestRate}
+                                </td>
+                                <td className="px-4 py-4 text-base font-medium text-black border-r border-gray-200">
+                                  {violation.lateFeePolicy}
+                                </td>
+                                <td className="px-4 py-4 text-base font-medium text-black border-r border-gray-200">
+                                  {violation.notes}
+                                </td>
+                                <td className="px-4 py-4 text-base font-medium text-black">
+                                  <button
+                                    onClick={() =>
+                                      handleAddFromSample(violation.id)
+                                    }
+                                    disabled={isSampleAdded(violation.id)}
+                                    className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap cursor-pointer ${
+                                      isSampleAdded(violation.id)
+                                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        : "text-white"
+                                    }`}
+                                    style={
+                                      !isSampleAdded(violation.id)
+                                        ? { backgroundColor: "#1FA372" }
+                                        : {}
+                                    }
+                                  >
+                                    Add
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
 
-                    {activeTab === "escalation-policy" && (
-                      <table className="w-full">
-                        <thead style={{ backgroundColor: "#DCDCDC" }}>
-                          <tr>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "15%" }}
-                            >
-                              Notice #
-                            </th>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "10%" }}
-                            >
-                              Action
-                            </th>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "35%" }}
-                            >
-                              Example Calculation (Monthly HOA Fee = $100)
-                            </th>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider"
-                              style={{ color: "#000000", width: "8%" }}
-                            >
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {sampleEscalations.map((escalation) => (
-                            <tr
-                              key={escalation.id}
-                              className="hover:bg-gray-50"
-                            >
-                              <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
-                                {escalation.noticeNumber}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {escalation.action}
-                              </td>
-                              <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
-                                {escalation.calculation}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black">
-                                <button
-                                  onClick={() =>
-                                    handleAddFromSample(escalation.id)
-                                  }
-                                  disabled={isSampleAdded(escalation.id)}
-                                  className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap cursor-pointer ${
-                                    isSampleAdded(escalation.id)
-                                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                      : "text-white"
-                                  }`}
-                                  style={
-                                    !isSampleAdded(escalation.id)
-                                      ? { backgroundColor: "#1FA372" }
-                                      : {}
-                                  }
-                                >
-                                  Add
-                                </button>
-                              </td>
+                      {activeTab === "escalation-policy" && (
+                        <table className="w-full">
+                          <thead style={{ backgroundColor: "#DCDCDC" }}>
+                            <tr>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000", width: "15%" }}
+                              >
+                                Notice #
+                              </th>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000", width: "10%" }}
+                              >
+                                Action
+                              </th>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000", width: "35%" }}
+                              >
+                                Example Calculation (Monthly HOA Fee = $100)
+                              </th>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider"
+                                style={{ color: "#000000", width: "8%" }}
+                              >
+                                Action
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {sampleEscalations.map((escalation) => (
+                              <tr
+                                key={escalation.id}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
+                                  {escalation.noticeNumber}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
+                                  {escalation.action}
+                                </td>
+                                <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
+                                  {escalation.calculation}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black">
+                                  <button
+                                    onClick={() =>
+                                      handleAddFromSample(escalation.id)
+                                    }
+                                    disabled={isSampleAdded(escalation.id)}
+                                    className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap cursor-pointer ${
+                                      isSampleAdded(escalation.id)
+                                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        : "text-white"
+                                    }`}
+                                    style={
+                                      !isSampleAdded(escalation.id)
+                                        ? { backgroundColor: "#1FA372" }
+                                        : {}
+                                    }
+                                  >
+                                    Add
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
 
-                    {activeTab === "amenities-reservations" && (
-                      <table className="w-full">
-                        <thead style={{ backgroundColor: "#DCDCDC" }}>
-                          <tr>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "15%" }}
-                            >
-                              Type
-                            </th>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "10%" }}
-                            >
-                              Typical Fee
-                            </th>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "10%" }}
-                            >
-                              Refundable
-                            </th>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                              style={{ color: "#000000", width: "25%" }}
-                            >
-                              Notes
-                            </th>
-                            <th
-                              className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider"
-                              style={{ color: "#000000", width: "8%" }}
-                            >
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {sampleAmenities.map((amenity) => (
-                            <tr key={amenity.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
-                                {amenity.type}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {amenity.typicalFee}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
-                                {amenity.refundable}
-                              </td>
-                              <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
-                                {amenity.notes}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black">
-                                <button
-                                  onClick={() =>
-                                    handleAddFromSample(amenity.id)
-                                  }
-                                  disabled={isSampleAdded(amenity.id)}
-                                  className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap cursor-pointer ${
-                                    isSampleAdded(amenity.id)
-                                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                      : "text-white"
-                                  }`}
-                                  style={
-                                    !isSampleAdded(amenity.id)
-                                      ? { backgroundColor: "#1FA372" }
-                                      : {}
-                                  }
-                                >
-                                  Add
-                                </button>
-                              </td>
+                      {activeTab === "amenities-reservations" && (
+                        <table className="w-full">
+                          <thead style={{ backgroundColor: "#DCDCDC" }}>
+                            <tr>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000", width: "15%" }}
+                              >
+                                Type
+                              </th>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000", width: "10%" }}
+                              >
+                                Typical Fee
+                              </th>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000", width: "10%" }}
+                              >
+                                Refundable
+                              </th>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
+                                style={{ color: "#000000", width: "25%" }}
+                              >
+                                Notes
+                              </th>
+                              <th
+                                className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider"
+                                style={{ color: "#000000", width: "8%" }}
+                              >
+                                Action
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {sampleAmenities.map((amenity) => (
+                              <tr key={amenity.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
+                                  {amenity.type}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
+                                  {amenity.typicalFee}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black border-r border-gray-200">
+                                  {amenity.refundable}
+                                </td>
+                                <td className="px-6 py-4 text-base font-medium text-black border-r border-gray-200">
+                                  {amenity.notes}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-black">
+                                  <button
+                                    onClick={() =>
+                                      handleAddFromSample(amenity.id)
+                                    }
+                                    disabled={isSampleAdded(amenity.id)}
+                                    className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap cursor-pointer ${
+                                      isSampleAdded(amenity.id)
+                                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        : "text-white"
+                                    }`}
+                                    style={
+                                      !isSampleAdded(amenity.id)
+                                        ? { backgroundColor: "#1FA372" }
+                                        : {}
+                                    }
+                                  >
+                                    Add
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
