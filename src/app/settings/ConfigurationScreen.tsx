@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Sidebar from "../../components/Sidebar";
 import DashboardLayout from "@/src/components/layout/DashboardLayout";
-import { useLazyGetViolationDefaultsQuery } from "@/src/services/hoa-violations";
+import {
+  useLazyGetViolationDefaultsQuery,
+  useUpdateViolationDefaultsMutation,
+} from "@/src/services/hoa-violations";
+import { useAppDispatch } from "@/src/lib/hooks";
+import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 type TabType =
   | "violation-schedule"
@@ -56,10 +60,13 @@ interface NotificationSetting {
 }
 
 export default function ConfigurationScreen() {
+  const dispatch = useAppDispatch();
   const [
     getViolationDefaults,
     { data: defaultViolationsData, isLoading: isLoadingViolationsDefaults },
   ] = useLazyGetViolationDefaultsQuery();
+
+  const [updateViolationDefaults] = useUpdateViolationDefaultsMutation();
 
   const [activeTab, setActiveTab] = useState<TabType>("violation-schedule");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -591,12 +598,43 @@ export default function ConfigurationScreen() {
     }
   };
 
+  const handleUpdateViolationDefaults = async () => {
+    try {
+      const payload = violationRecords.map((record) => ({
+        id:
+          defaultViolationsData?.violationDefaults.find(
+            (v) => v.violationType === record.type,
+          )?.id || record.id,
+        violationType: record.type,
+        compliancePeriod: parseInt(record.compliancePeriod),
+        responsePeriod: parseInt(record.responsePeriod),
+      }));
+      await updateViolationDefaults(payload).unwrap();
+      dispatch(
+        setNotification({
+          type: "success",
+          message: "Violation defaults updated successfully.",
+        }),
+      );
+    } catch (error: any) {
+      dispatch(
+        setNotification({
+          type: "error",
+          message:
+            error.message ||
+            "Failed to update violation defaults. Please try again.",
+        }),
+      );
+    }
+  };
+
   const handleSave = () => {
     switch (activeTab) {
       case "violation-schedule":
         setViolationRecords((prev) =>
           prev.map((item) => ({ ...item, isEditing: false })),
         );
+        handleUpdateViolationDefaults();
         break;
       case "escalation-policy":
         setEscalationRecords((prev) =>

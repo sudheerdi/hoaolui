@@ -37,6 +37,16 @@ export const hoaViolationsApi = createApi({
         body: payload,
       }),
     }),
+    updateViolationDefaults: builder.mutation<
+      ViolationDefaultsType,
+      ViolationDefaultsRequestType
+    >({
+      query: (payload) => ({
+        url: "violations/defaults",
+        method: "PUT",
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -44,4 +54,5 @@ export const {
   useLazyGetViolationsQuery,
   useLazyGetViolationDefaultsQuery,
   useCreateViolationMutation,
+  useUpdateViolationDefaultsMutation,
 } = hoaViolationsApi;

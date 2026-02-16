@@ -71,3 +71,10 @@ type ViolationResponseType = {
   complianceDueDate: string;
   generatedNotice: string;
 };
+
+type ViolationDefaultsRequestType = Array<{
+  id: string;
+  violationType: string;
+  compliancePeriod: number;
+  responsePeriod: number;
+}>;
