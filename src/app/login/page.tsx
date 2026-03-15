@@ -29,7 +29,7 @@ export default function Login() {
         setNotification({
           type: "error",
           message: "Please fill in all required fields.",
-        })
+        }),
       );
       return;
     }
@@ -40,7 +40,7 @@ export default function Login() {
         setNotification({
           type: "error",
           message: "Invalid email or password. Please try again.",
-        })
+        }),
       );
       return;
     }
@@ -53,8 +53,8 @@ export default function Login() {
       dispatch(
         setNotification({
           type: "error",
-          message: error ? error?.data.error : "An unknown error occurred.",
-        })
+          message: error ? error?.data?.error : "An unknown error occurred.",
+        }),
       );
     }
   };
@@ -244,7 +244,7 @@ export default function Login() {
                 <button
                   onClick={() => {
                     const signInButton = document.querySelector(
-                      "[data-signin-trigger]"
+                      "[data-signin-trigger]",
                     ) as HTMLElement;
                     if (signInButton) {
                       signInButton.click();

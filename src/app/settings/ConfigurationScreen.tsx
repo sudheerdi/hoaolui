@@ -1002,19 +1002,19 @@ export default function ConfigurationScreen() {
             )}
             <th
               className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "15%" }}
+              style={{ color: "#000000" }}
             >
               Notice #
             </th>
             <th
               className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-              style={{ color: "#000000", width: "10%" }}
+              style={{ color: "#000000" }}
             >
               Action
             </th>
             <th
               className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider"
-              style={{ color: "#000000", width: "35%" }}
+              style={{ color: "#000000" }}
             >
               {isEditable
                 ? "Calculation"
@@ -1699,25 +1699,25 @@ export default function ConfigurationScreen() {
                             <tr>
                               <th
                                 className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                                style={{ color: "#000000", width: "15%" }}
+                                style={{ color: "#000000" }}
                               >
                                 Notice #
                               </th>
                               <th
                                 className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                                style={{ color: "#000000", width: "10%" }}
+                                style={{ color: "#000000" }}
                               >
                                 Action
                               </th>
                               <th
                                 className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider border-r border-gray-200"
-                                style={{ color: "#000000", width: "35%" }}
+                                style={{ color: "#000000" }}
                               >
                                 Example Calculation (Monthly HOA Fee = $100)
                               </th>
                               <th
                                 className="px-6 py-3 text-left text-sm font-bold uppercase tracking-wider"
-                                style={{ color: "#000000", width: "8%" }}
+                                style={{ color: "#000000" }}
                               >
                                 Action
                               </th>
