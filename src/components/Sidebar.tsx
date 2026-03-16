@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAppSelector } from "../lib/hooks";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAppSelector((state) => state.hoaUser);
+  const userRole = user?.memberships[0]?.role || "COMMUNITY_ADMIN";
 
   const menuItems = [
     { path: "/dashboard", label: "Dashboard", icon: "ri-dashboard-line" },
@@ -14,12 +17,16 @@ export default function Sidebar() {
       icon: "ri-money-dollar-circle-line",
     },
     { path: "/violations", label: "Violations", icon: "ri-alert-line" },
-    {
+    userRole === "COMMUNITY_ADMIN" && {
       path: "/approval-requests",
       label: "Approvals",
       icon: "ri-file-list-3-line",
     },
-    { path: "/units", label: "Units", icon: "ri-building-line" },
+    userRole === "COMMUNITY_ADMIN" && {
+      path: "/units",
+      label: "Units",
+      icon: "ri-building-line",
+    },
     { path: "/votes-polling", label: "Votes", icon: "ri-pie-chart-line" },
     { path: "/calendar", label: "Calendar", icon: "ri-calendar-line" },
     { path: "/hoa-documentation", label: "Documents", icon: "ri-folder-line" },
@@ -28,17 +35,31 @@ export default function Sidebar() {
       label: "Message Board",
       icon: "ri-message-3-line",
     },
-    {
+    userRole === "COMMUNITY_ADMIN" && {
       path: "/settings",
       label: "Configuration Policies",
       icon: "ri-settings-3-line",
     },
-    {
+    userRole === "COMMUNITY_ADMIN" && {
       path: "/maintenance-schedule",
       label: "Maintenance Schedule",
       icon: "ri-tools-line",
     },
-    { path: "/community-watch", label: "Community Watch", icon: "ri-eye-line" },
+    userRole === "COMMUNITY_ADMIN" && {
+      path: "/community-watch",
+      label: "Community Watch",
+      icon: "ri-eye-line",
+    },
+    userRole === "COMMUNITY_MEMBER" && {
+      label: "Requests",
+      icon: "ri-file-list-3-line",
+      path: "/requests",
+    },
+    userRole === "COMMUNITY_MEMBER" && {
+      label: "Service Recommendations",
+      icon: "ri-customer-service-2-line",
+      path: "/service-recommendations",
+    },
   ];
 
   return (
@@ -57,6 +78,7 @@ export default function Sidebar() {
 
       <nav className="flex-1 overflow-y-auto py-4" suppressHydrationWarning>
         {menuItems.map((item) => {
+          if (!item) return null;
           const isActive = pathname === item.path;
           return (
             <Link

@@ -1,6 +1,4 @@
 "use client";
-import Navbar from "../components/feature/Navbar";
-import Footer from "../components/feature/Footer";
 import HeroSection from "../components/home/HeroSection";
 import FeaturesSection from "../components/home/FeaturesSection";
 import WhyChooseSection from "../components/home/WhyChooseSection";

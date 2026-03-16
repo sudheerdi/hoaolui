@@ -37,12 +37,14 @@ export default function UserProfile() {
           ></div>
 
           <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-semibold text-gray-900">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-gray-500">{user?.emailId}</p>
-            </div>
+            {user?.memberships[0]?.role === "COMMUNITY_ADMIN" && (
+              <div className="px-4 py-3 border-b border-gray-100">
+                <p className="text-sm font-semibold text-gray-900">
+                  {user.firstName} {user.lastName}
+                </p>
+                <p className="text-xs text-gray-500">{user.emailId}</p>
+              </div>
+            )}
 
             <div className="py-2">
               <Link
@@ -69,29 +71,33 @@ export default function UserProfile() {
                 <span>Settings</span>
               </Link>
 
-              <Link
-                href="/notifications"
-                prefetch={false}
-                className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => setIsOpen(false)}
-              >
-                <div className="w-5 h-5 flex items-center justify-center">
-                  <i className="ri-notification-3-line text-gray-600"></i>
-                </div>
-                <span>Notifications</span>
-              </Link>
+              {user?.memberships[0]?.role === "COMMUNITY_ADMIN" && (
+                <>
+                  <Link
+                    href="/notifications"
+                    prefetch={false}
+                    className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <div className="w-5 h-5 flex items-center justify-center">
+                      <i className="ri-notification-3-line text-gray-600"></i>
+                    </div>
+                    <span>Notifications</span>
+                  </Link>
 
-              <Link
-                href="/create-community"
-                prefetch={false}
-                className="flex items-center space-x-3 px-4 py-2.5 text-sm text-white bg-[#1FA372] hover:bg-[#188f5f] transition-colors cursor-pointer mx-2 rounded-lg mt-2 whitespace-nowrap"
-                onClick={() => setIsOpen(false)}
-              >
-                <div className="w-5 h-5 flex items-center justify-center">
-                  <i className="ri-add-circle-line"></i>
-                </div>
-                <span>Create Community</span>
-              </Link>
+                  <Link
+                    href="/create-community"
+                    prefetch={false}
+                    className="flex items-center space-x-3 px-4 py-2.5 text-sm text-white bg-[#1FA372] hover:bg-[#188f5f] transition-colors cursor-pointer mx-2 rounded-lg mt-2 whitespace-nowrap"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <div className="w-5 h-5 flex items-center justify-center">
+                      <i className="ri-add-circle-line"></i>
+                    </div>
+                    <span>Create Community</span>
+                  </Link>
+                </>
+              )}
             </div>
 
             <div className="border-t border-gray-100 pt-2 mt-2">

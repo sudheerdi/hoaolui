@@ -14,12 +14,15 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useState } from "react";
+import { use, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/src/lib/hooks";
 import SendViolationModal from "@/src/components/modals/SendViolationModal";
 import { useUserAuthToken } from "@/src/helpers/hooks/useUserAuthToken";
 import Notification from "@/src/components/base/Notification";
 import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
+import PaymentsChart from "@/src/components/PaymentsChart";
+import ViolationsCard from "@/src/components/ViolationsCard";
+import RequestsCard from "@/src/components/RequestsCard";
 
 const revenueData = [
   { month: "Jan", revenue: 45000 },
@@ -44,7 +47,9 @@ export default function Dashboard() {
   const [showSendViolationModal, setShowSendViolationModal] = useState(false);
   const [showMakePaymentModal, setShowMakePaymentModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [userRole, setUserRole] = useState<"admin" | "homeowner">("admin");
+  const [userRole, setUserRole] = useState<
+    "COMMUNITY_ADMIN" | "COMMUNITY_MEMBER"
+  >(user?.memberships[0]?.role as "COMMUNITY_ADMIN" | "COMMUNITY_MEMBER");
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
 
   const upcomingEvents = [
@@ -127,7 +132,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="ml-0 lg:ml-[260px] lg:mr-[300px] p-[10px] h-screen flex flex-col">
+      <div
+        className={`ml-0 lg:ml-[260px] p-[10px] h-screen flex flex-col ${userRole === "COMMUNITY_ADMIN" ? "lg:mr-[300px]" : ""}`}
+      >
         <div className="bg-white rounded-lg shadow-sm flex flex-col h-full overflow-hidden">
           <div className="bg-white px-4 py-2 flex-shrink-0 border-b border-gray-200">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -143,125 +150,140 @@ export default function Dashboard() {
                     Welcome {user?.firstName} {user?.lastName}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    Manage your community with ease
+                    {userRole === "COMMUNITY_ADMIN"
+                      ? "Manage your community with ease"
+                      : "Welcome back to your community portal"}
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <button
-                    onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
-                    className="flex items-center space-x-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <div className="w-5 h-5 flex items-center justify-center">
-                      <i
-                        className={`${
-                          userRole === "admin"
-                            ? "ri-shield-user-line"
-                            : "ri-home-4-line"
-                        } text-gray-700`}
-                      ></i>
+                {userRole === "COMMUNITY_ADMIN" && (
+                  <>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+                        className="flex items-center space-x-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <div className="w-5 h-5 flex items-center justify-center">
+                          <i
+                            className={`${
+                              userRole === "COMMUNITY_ADMIN"
+                                ? "ri-shield-user-line"
+                                : "ri-home-4-line"
+                            } text-gray-700`}
+                          ></i>
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                          {userRole === "COMMUNITY_ADMIN"
+                            ? "HOA Board"
+                            : "Homeowner"}
+                        </span>
+                        <div className="w-4 h-4 flex items-center justify-center">
+                          <i
+                            className={`ri-arrow-${
+                              showRoleSwitcher ? "up" : "down"
+                            }-s-line text-gray-600`}
+                          ></i>
+                        </div>
+                      </button>
+
+                      {showRoleSwitcher && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-10"
+                            onClick={() => setShowRoleSwitcher(false)}
+                          ></div>
+
+                          <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                            <button
+                              onClick={() => {
+                                setUserRole("COMMUNITY_ADMIN");
+                                setShowRoleSwitcher(false);
+                              }}
+                              className={`w-full flex items-center space-x-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${
+                                userRole === "COMMUNITY_ADMIN"
+                                  ? "bg-green-50"
+                                  : ""
+                              }`}
+                            >
+                              <div className="w-5 h-5 flex items-center justify-center">
+                                <i className="ri-shield-user-line text-gray-700"></i>
+                              </div>
+                              <div className="flex-1 text-left">
+                                <div className="font-medium text-gray-900">
+                                  HOA Board Member
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Full admin access
+                                </div>
+                              </div>
+                              {userRole === "COMMUNITY_ADMIN" && (
+                                <div className="w-5 h-5 flex items-center justify-center">
+                                  <i className="ri-check-line text-[#1FA372]"></i>
+                                </div>
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                setUserRole("COMMUNITY_MEMBER");
+                                setShowRoleSwitcher(false);
+                              }}
+                              className="w-full flex items-center space-x-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors cursor-pointer bg-green-50"
+                            >
+                              <div className="w-5 h-5 flex items-center justify-center">
+                                <i className="ri-home-4-line text-gray-700"></i>
+                              </div>
+                              <div className="flex-1 text-left">
+                                <div className="font-medium text-gray-900">
+                                  Homeowner
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Resident view
+                                </div>
+                              </div>
+                              <div className="w-5 h-5 flex items-center justify-center">
+                                <i className="ri-check-line text-[#1FA372]"></i>
+                              </div>
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                      {userRole === "admin" ? "HOA Board" : "Homeowner"}
-                    </span>
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      <i
-                        className={`ri-arrow-${
-                          showRoleSwitcher ? "up" : "down"
-                        }-s-line text-gray-600`}
-                      ></i>
-                    </div>
-                  </button>
 
-                  {showRoleSwitcher && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setShowRoleSwitcher(false)}
-                      ></div>
-
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-                        <button
-                          onClick={() => {
-                            setUserRole("admin");
-                            setShowRoleSwitcher(false);
-                          }}
-                          className={`w-full flex items-center space-x-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${
-                            userRole === "admin" ? "bg-green-50" : ""
-                          }`}
-                        >
-                          <div className="w-5 h-5 flex items-center justify-center">
-                            <i className="ri-shield-user-line text-gray-700"></i>
-                          </div>
-                          <div className="flex-1 text-left">
-                            <div className="font-medium text-gray-900">
-                              HOA Board Member
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              Full admin access
-                            </div>
-                          </div>
-                          {userRole === "admin" && (
-                            <div className="w-5 h-5 flex items-center justify-center">
-                              <i className="ri-check-line text-[#1FA372]"></i>
-                            </div>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setUserRole("homeowner");
-                            setShowRoleSwitcher(false);
-                          }}
-                          className={`w-full flex items-center space-x-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${
-                            userRole === "homeowner" ? "bg-green-50" : ""
-                          }`}
-                        >
-                          <div className="w-5 h-5 flex items-center justify-center">
-                            <i className="ri-home-4-line text-gray-700"></i>
-                          </div>
-                          <div className="flex-1 text-left">
-                            <div className="font-medium text-gray-900">
-                              Homeowner
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              Resident view
-                            </div>
-                          </div>
-                          {userRole === "homeowner" && (
-                            <div className="w-5 h-5 flex items-center justify-center">
-                              <i className="ri-check-line text-[#1FA372]"></i>
-                            </div>
-                          )}
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => setShowMakePaymentModal(true)}
-                  className="hidden lg:block px-4 py-2 bg-[#1FA372] text-white text-sm font-medium rounded-lg hover:bg-[#188f5f] transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  Make a Payment
-                </button>
-                <button
-                  onClick={() => setShowSendViolationModal(true)}
-                  className="hidden lg:block px-4 py-2 bg-[#1FA372] text-white text-sm font-medium rounded-lg hover:bg-[#188f5f] transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  Send Violation
-                </button>
+                    <button
+                      onClick={() => setShowMakePaymentModal(true)}
+                      className="hidden lg:block px-4 py-2 bg-[#1FA372] text-white text-sm font-medium rounded-lg hover:bg-[#188f5f] transition-colors cursor-pointer whitespace-nowrap"
+                    >
+                      Make a Payment
+                    </button>
+                    <button
+                      onClick={() => setShowSendViolationModal(true)}
+                      className="hidden lg:block px-4 py-2 bg-[#1FA372] text-white text-sm font-medium rounded-lg hover:bg-[#188f5f] transition-colors cursor-pointer whitespace-nowrap"
+                    >
+                      Send Violation
+                    </button>
+                  </>
+                )}
 
                 <div className="relative">
                   <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-                    <i className="ri-notification-3-line text-lg"></i>
+                    <i className="ri-notification-3-line text-2xl"></i>
                   </button>
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                     3
                   </div>
                 </div>
+
+                {userRole === "COMMUNITY_MEMBER" && (
+                  <div className="text-right">
+                    <div className="text-md font-bold text-black">
+                      {user?.memberships[0]?.communityName}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">ToDo</div>
+                  </div>
+                )}
 
                 <UserProfile />
               </div>
@@ -269,142 +291,110 @@ export default function Dashboard() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F9FAFB]">
-            <div className="mb-4 block lg:hidden">
-              <PaymentStatusChart />
-            </div>
+            {userRole === "COMMUNITY_ADMIN" && (
+              <>
+                <div className="mb-4">
+                  <PaymentStatusChart />
+                </div>
 
-            <div className="flex flex-col lg:flex-row gap-4 lg:hidden">
-              <div className="w-full">
-                <BudgetChart />
-              </div>
-              <div className="w-full">
-                <div className="bg-white rounded-lg shadow-sm p-6 h-auto border border-gray-100">
-                  <h3 className="text-xl font-bold text-black mb-4">
-                    Revenue Trends
-                  </h3>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={revenueData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis
-                          dataKey="month"
-                          tick={{ fill: "#000000", fontWeight: 500 }}
-                        />
-                        <YAxis
-                          tick={{ fill: "#000000", fontWeight: 500 }}
-                          tickFormatter={(value) =>
-                            `$${(value / 1000).toFixed(0)}k`
-                          }
-                        />
-                        <Tooltip
-                          formatter={(value, name) => [
-                            `$${value?.toLocaleString()}`,
-                            "Revenue",
-                          ]}
-                          labelStyle={{ color: "#000" }}
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            border: "1px solid #ccc",
-                          }}
-                        />
-                        <Bar
-                          dataKey="revenue"
-                          fill="#1FA372"
-                          barSize={5}
-                          radius={[2.5, 2.5, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
+                <div className="lg:flex flex-col lg:flex-row gap-4">
+                  <div className="w-full lg:w-[33.33%]">
+                    <BudgetChart />
+                  </div>
+                  <div className="w-full lg:w-[66.67%]">
+                    <div className="bg-white rounded-lg shadow-sm p-6 h-auto lg:h-[500px] border border-gray-100">
+                      <h3 className="text-xl font-bold text-black mb-4">
+                        Revenue Trends
+                      </h3>
+                      <div className="h-[300px] lg:h-[400px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={revenueData}
+                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              dataKey="month"
+                              tick={{ fill: "#000000", fontWeight: 500 }}
+                            />
+                            <YAxis
+                              tick={{ fill: "#000000", fontWeight: 500 }}
+                              tickFormatter={(value) =>
+                                `$${(value / 1000).toFixed(0)}k`
+                              }
+                            />
+                            <Tooltip
+                              formatter={(value, name) => [
+                                `$${value?.toLocaleString()}`,
+                                "Revenue",
+                              ]}
+                              labelStyle={{ color: "#000" }}
+                              contentStyle={{
+                                backgroundColor: "#fff",
+                                border: "1px solid #ccc",
+                              }}
+                            />
+                            <Bar
+                              dataKey="revenue"
+                              fill="#1FA372"
+                              barSize={5}
+                              radius={[2.5, 2.5, 0, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
 
-            <div className="hidden lg:block mb-4">
-              <PaymentStatusChart />
-            </div>
+            {userRole === "COMMUNITY_MEMBER" && (
+              <>
+                <div className="p-6 space-y-4">
+                  <PaymentsChart />
 
-            <div className="hidden lg:flex flex-col lg:flex-row gap-4">
-              <div className="w-full lg:w-[33.33%]">
-                <BudgetChart />
-              </div>
-              <div className="w-full lg:w-[66.67%]">
-                <div className="bg-white rounded-lg shadow-sm p-6 h-auto lg:h-[500px] border border-gray-100">
-                  <h3 className="text-xl font-bold text-black mb-4">
-                    Revenue Trends
-                  </h3>
-                  <div className="h-[300px] lg:h-[400px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={revenueData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis
-                          dataKey="month"
-                          tick={{ fill: "#000000", fontWeight: 500 }}
-                        />
-                        <YAxis
-                          tick={{ fill: "#000000", fontWeight: 500 }}
-                          tickFormatter={(value) =>
-                            `$${(value / 1000).toFixed(0)}k`
-                          }
-                        />
-                        <Tooltip
-                          formatter={(value, name) => [
-                            `$${value?.toLocaleString()}`,
-                            "Revenue",
-                          ]}
-                          labelStyle={{ color: "#000" }}
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            border: "1px solid #ccc",
-                          }}
-                        />
-                        <Bar
-                          dataKey="revenue"
-                          fill="#1FA372"
-                          barSize={5}
-                          radius={[2.5, 2.5, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
+                  <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                    <h3 className="text-lg font-bold text-black mb-6">Open</h3>
+                    <div className="grid grid-cols-2 gap-6">
+                      <ViolationsCard />
+                      <RequestsCard />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="hidden lg:block fixed right-0 top-[10px] bottom-[10px] w-[280px] mr-[10px]">
-        <div className="bg-white rounded-lg shadow-sm h-full overflow-hidden border border-gray-100 flex flex-col">
-          <div className="bg-white p-4 border-b border-gray-200">
-            <h3 className="text-lg font-bold text-black text-center">
-              Upcoming Events
-            </h3>
-          </div>
-          <div className="flex-1 overflow-y-auto bg-[#F9FAFB] p-4">
-            <div className="space-y-3">
-              {upcomingEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className="bg-white rounded-lg p-3 border border-gray-100 shadow-sm"
-                >
-                  <h4 className="text-sm font-medium text-gray-900 mb-1 leading-tight">
-                    {event.title}
-                  </h4>
-                  <p className="text-sm text-gray-600 mb-1">{event.date}</p>
-                  <p className="text-sm text-gray-500">{event.time}</p>
-                </div>
-              ))}
+      {userRole === "COMMUNITY_ADMIN" && (
+        <div className="hidden lg:block fixed right-0 top-[10px] bottom-[10px] w-[280px] mr-[10px]">
+          <div className="bg-white rounded-lg shadow-sm h-full overflow-hidden border border-gray-100 flex flex-col">
+            <div className="bg-white p-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-black text-center">
+                Upcoming Events
+              </h3>
+            </div>
+            <div className="flex-1 overflow-y-auto bg-[#F9FAFB] p-4">
+              <div className="space-y-3">
+                {upcomingEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="bg-white rounded-lg p-3 border border-gray-100 shadow-sm"
+                  >
+                    <h4 className="text-sm font-medium text-gray-900 mb-1 leading-tight">
+                      {event.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-1">{event.date}</p>
+                    <p className="text-sm text-gray-500">{event.time}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       <MakePaymentModal
         isOpen={showMakePaymentModal}
