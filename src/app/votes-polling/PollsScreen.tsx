@@ -245,7 +245,7 @@ export default function PollsScreen() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="lg:ml-[260px] bg-white rounded-lg min-h-[calc(100vh-20px)] flex flex-col">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-3 rounded-t-lg">
@@ -456,6 +456,6 @@ export default function PollsScreen() {
           onClick={() => setShowCreatePopover(false)}
         ></div>
       )}
-    </DashboardLayout>
+    </>
   );
 }

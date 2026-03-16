@@ -5,7 +5,6 @@ import ViolationDetails from "./ViolationDetails";
 import { useLazyGetViolationsQuery } from "../../services";
 import SendViolationModal from "../../components/modals/SendViolationModal";
 import { useAppDispatch } from "@/src/lib/hooks";
-import DashboardLayout from "@/src/components/layout/DashboardLayout";
 import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 export default function ViolationsScreen() {
@@ -116,7 +115,7 @@ export default function ViolationsScreen() {
   }, [searchTerm, currentViolations, statusFilter]);
 
   return (
-    <DashboardLayout>
+    <>
       <div className="lg:ml-[260px] bg-white rounded-lg min-h-[calc(100vh-20px)] flex flex-col">
         {/* Top Bar */}
         <div className="bg-white border-b border-gray-200 px-4 py-3 rounded-t-lg">
@@ -389,6 +388,6 @@ export default function ViolationsScreen() {
           if (e) handleGetAllViolations();
         }}
       />
-    </DashboardLayout>
+    </>
   );
 }

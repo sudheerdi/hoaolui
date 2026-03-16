@@ -636,7 +636,7 @@ export default function DocumentationScreen() {
   }, []);
 
   return (
-    <DashboardLayout>
+    <>
       <div className="lg:ml-[260px] bg-white rounded-lg h-[calc(100vh-20px)] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg flex-shrink-0">
@@ -1112,6 +1112,6 @@ export default function DocumentationScreen() {
           </div>
         </>
       )}
-    </DashboardLayout>
+    </>
   );
 }
