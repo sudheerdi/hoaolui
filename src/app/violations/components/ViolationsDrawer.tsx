@@ -3,12 +3,17 @@ interface ViolationsDrawerProps {
   onClose: () => void;
 }
 
-export default function ViolationsDrawer({ violation, onClose }: ViolationsDrawerProps) {
+export default function ViolationsDrawer({
+  violation,
+  onClose,
+}: ViolationsDrawerProps) {
   return (
     <div className="h-full bg-white border-l border-gray-200 shadow-lg flex flex-col">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Violation Details</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          Violation Details
+        </h2>
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 cursor-pointer w-6 h-6 flex items-center justify-center"
@@ -22,26 +27,32 @@ export default function ViolationsDrawer({ violation, onClose }: ViolationsDrawe
         <div className="space-y-6">
           {/* Status Badge */}
           <div>
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              violation.status === 'Resolved'
-                ? 'bg-green-100 text-green-800'
-                : violation.status === 'In Progress'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-yellow-100 text-yellow-800'
-            }`}>
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                violation.status === "Resolved"
+                  ? "bg-green-100 text-green-800"
+                  : violation.status === "In Progress"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-yellow-100 text-yellow-800"
+              }`}
+            >
               {violation.status}
             </span>
           </div>
 
           {/* Violation Type */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-1">Violation Type</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-1">
+              Violation Type
+            </h3>
             <p className="text-base text-gray-900">{violation.type}</p>
           </div>
 
           {/* Description */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-1">Description</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-1">
+              Description
+            </h3>
             <p className="text-base text-gray-900">{violation.description}</p>
           </div>
 
@@ -64,45 +75,56 @@ export default function ViolationsDrawer({ violation, onClose }: ViolationsDrawe
           {/* Dates */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Issued Date</h3>
-              <p className="text-base text-gray-900">{violation.issued}</p>
+              <h3 className="text-sm font-medium text-gray-500 mb-1">
+                Issued Date
+              </h3>
+              <p className="text-base text-gray-900">
+                {new Date(violation.createdAt).toLocaleDateString()}
+              </p>
             </div>
-            {violation.dueDate && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Due Date</h3>
-                <p className="text-base text-gray-900">{violation.dueDate}</p>
-              </div>
-            )}
-            {violation.resolvedDate && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Resolved Date</h3>
-                <p className="text-base text-gray-900">{violation.resolvedDate}</p>
-              </div>
-            )}
+            <div>
+              <h3 className="text-sm font-medium text-gray-500 mb-1">
+                Due Date
+              </h3>
+              <p className="text-base text-gray-900">ToDo</p>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-500 mb-1">
+                Resolved Date
+              </h3>
+              <p className="text-base text-gray-900">ToDo</p>
+            </div>
           </div>
 
           {/* Fine Amount */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-1">Fine Amount</h3>
-            <p className="text-lg font-semibold text-gray-900">{violation.fine}</p>
+            <h3 className="text-sm font-medium text-gray-500 mb-1">
+              Fine Amount
+            </h3>
+            <p className="text-lg font-semibold text-gray-900">ToDo</p>
           </div>
 
           {/* Additional Information */}
-          {violation.additionalInfo && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Additional Information</h3>
-              <p className="text-base text-gray-900">{violation.additionalInfo}</p>
-            </div>
-          )}
+
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-1">
+              Additional Information
+            </h3>
+            <p className="text-base text-gray-900">ToDo</p>
+          </div>
 
           {/* Attachments */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Attachments</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">
+              Attachments
+            </h3>
             <div className="space-y-2">
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-center space-x-3">
                   <i className="ri-file-text-line text-gray-400 text-xl w-5 h-5 flex items-center justify-center"></i>
-                  <span className="text-sm text-gray-900">violation_notice.pdf</span>
+                  <span className="text-sm text-gray-900">
+                    violation_notice.pdf
+                  </span>
                 </div>
                 <button className="text-[#4D8555] hover:text-[#3d6a44] cursor-pointer">
                   <i className="ri-download-line text-lg w-5 h-5 flex items-center justify-center"></i>
@@ -111,7 +133,9 @@ export default function ViolationsDrawer({ violation, onClose }: ViolationsDrawe
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-center space-x-3">
                   <i className="ri-image-line text-gray-400 text-xl w-5 h-5 flex items-center justify-center"></i>
-                  <span className="text-sm text-gray-900">evidence_photo.jpg</span>
+                  <span className="text-sm text-gray-900">
+                    evidence_photo.jpg
+                  </span>
                 </div>
                 <button className="text-[#4D8555] hover:text-[#3d6a44] cursor-pointer">
                   <i className="ri-download-line text-lg w-5 h-5 flex items-center justify-center"></i>

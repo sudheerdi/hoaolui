@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ViolationDetails from "./ViolationDetails";
+import ViolationDetails from "./components/ViolationDetails";
 import { useLazyGetViolationsQuery } from "../../services";
 import SendViolationModal from "../../components/modals/SendViolationModal";
 import { useAppDispatch } from "@/src/lib/hooks";

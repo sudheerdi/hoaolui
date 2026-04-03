@@ -1,6 +1,6 @@
 "use client";
-import CalendarTopBar from "./CalendarTopBar";
-import CalendarContent from "./CalendarContent";
+import CalendarTopBar from "./components/CalendarTopBar";
+import CalendarContent from "./components/CalendarContent";
 
 export default function MemberCalendarScreen() {
   return (

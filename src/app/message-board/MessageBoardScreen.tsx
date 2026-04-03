@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import UserProfile from "../../components/UserProfile";
-import MessageList from "./MessageList";
-import MessageDetails from "./MessageDetails";
-import CreateAnnouncementModal from "./CreateAnnouncementModal";
+import MessageList from "./components/MessageList";
+import MessageDetails from "./components/MessageDetails";
+import CreateAnnouncementModal from "./components/CreateAnnouncementModal";
 
 export interface Message {
   id: string;
@@ -126,14 +126,14 @@ export default function MessageBoardScreen() {
   ]);
 
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(
-    messages[0]
+    messages[0],
   );
   const [filterTag, setFilterTag] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const handleCreateAnnouncement = (
-    announcement: Omit<Message, "id" | "likes" | "comments" | "isRead">
+    announcement: Omit<Message, "id" | "likes" | "comments" | "isRead">,
   ) => {
     const newMessage: Message = {
       ...announcement,

@@ -47,6 +47,12 @@ export const hoaViolationsApi = createApi({
         body: payload,
       }),
     }),
+    getMemberViolations: builder.query<ViolationsType, any>({
+      query: () => ({
+        url: "violations/my",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -55,4 +61,5 @@ export const {
   useLazyGetViolationDefaultsQuery,
   useCreateViolationMutation,
   useUpdateViolationDefaultsMutation,
+  useLazyGetMemberViolationsQuery,
 } = hoaViolationsApi;

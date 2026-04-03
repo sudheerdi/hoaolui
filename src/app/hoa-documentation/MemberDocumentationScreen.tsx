@@ -1,6 +1,6 @@
 "use client";
-import DocumentsTopBar from "./DocumentsTopBar";
-import DocumentsContent from "./DocumentsContent";
+import DocumentsTopBar from "./components/DocumentsTopBar";
+import DocumentsContent from "./components/DocumentsContent";
 
 export default function MemberDocumentationScreen() {
   return (

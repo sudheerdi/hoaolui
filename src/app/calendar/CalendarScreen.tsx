@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AddEventModal from "./AddEventModal";
+import AddEventModal from "./components/AddEventModal";
 import UserProfile from "../../components/UserProfile";
 
 interface Event {
@@ -271,19 +271,19 @@ export default function CalendarScreen() {
 
   const goToPreviousMonth = () => {
     setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
     );
   };
 
   const goToNextMonth = () => {
     setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
     );
   };
 
   const getEventsForDate = (day: number) => {
     const dateStr = `${currentDate.getFullYear()}-${String(
-      currentDate.getMonth() + 1
+      currentDate.getMonth() + 1,
     ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     return events.filter((event) => event.date === dateStr);
   };
@@ -292,7 +292,7 @@ export default function CalendarScreen() {
     const clickedDate = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      day
+      day,
     );
     setSelectedDate(clickedDate);
   };
@@ -300,7 +300,7 @@ export default function CalendarScreen() {
   const getSelectedDateEvents = () => {
     if (!selectedDate) return [];
     const dateStr = `${selectedDate.getFullYear()}-${String(
-      selectedDate.getMonth() + 1
+      selectedDate.getMonth() + 1,
     ).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
     return events.filter((event) => event.date === dateStr);
   };
@@ -374,7 +374,7 @@ export default function CalendarScreen() {
 
   const checkAvailability = () => {
     const selectedAmenity = amenities.find(
-      (a) => a.id === reservationData.amenity
+      (a) => a.id === reservationData.amenity,
     );
     return selectedAmenity?.available || false;
   };
@@ -400,7 +400,7 @@ export default function CalendarScreen() {
   const getDayViewEvents = () => {
     if (!selectedDate) return [];
     const dateStr = `${selectedDate.getFullYear()}-${String(
-      selectedDate.getMonth() + 1
+      selectedDate.getMonth() + 1,
     ).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
     return events
       .filter((event) => event.date === dateStr)
@@ -424,7 +424,7 @@ export default function CalendarScreen() {
 
   const getEventsForWeekDate = (date: Date) => {
     const dateStr = `${date.getFullYear()}-${String(
-      date.getMonth() + 1
+      date.getMonth() + 1,
     ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     return events.filter((event) => event.date === dateStr);
   };
@@ -467,12 +467,12 @@ export default function CalendarScreen() {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-10 h-10 rounded-lg ${getEventColor(
-                          event.type
+                          event.type,
                         )} flex items-center justify-center`}
                       >
                         <i
                           className={`${getEventIcon(
-                            event.type
+                            event.type,
                           )} text-white text-lg`}
                         ></i>
                       </div>
@@ -557,7 +557,7 @@ export default function CalendarScreen() {
                     <div
                       key={event.id}
                       className={`p-2 rounded text-sm font-medium text-white ${getEventColor(
-                        event.type
+                        event.type,
                       )} cursor-pointer hover:opacity-80`}
                       title={`${event.title} - ${event.time}`}
                     >
@@ -625,12 +625,12 @@ export default function CalendarScreen() {
                               <div
                                 key={idx}
                                 className={`w-4 h-4 rounded flex items-center justify-center ${getEventColor(
-                                  event.type
+                                  event.type,
                                 )}`}
                               >
                                 <i
                                   className={`${getEventIcon(
-                                    event.type
+                                    event.type,
                                   )} text-white text-xs`}
                                 ></i>
                               </div>
@@ -692,14 +692,14 @@ export default function CalendarScreen() {
                           year: "numeric",
                         })
                       : viewMode === "week"
-                      ? `Week of ${getWeekDates()[0].toLocaleDateString(
-                          "en-US",
-                          { month: "short", day: "numeric" }
-                        )}`
-                      : currentDate.toLocaleDateString("en-US", {
-                          month: "long",
-                          year: "numeric",
-                        })}
+                        ? `Week of ${getWeekDates()[0].toLocaleDateString(
+                            "en-US",
+                            { month: "short", day: "numeric" },
+                          )}`
+                        : currentDate.toLocaleDateString("en-US", {
+                            month: "long",
+                            year: "numeric",
+                          })}
                   </h2>
                   <button
                     onClick={goToNextMonth}
@@ -943,12 +943,12 @@ export default function CalendarScreen() {
                       <div className="flex items-center gap-2">
                         <div
                           className={`w-8 h-8 rounded-lg ${getEventColor(
-                            event.type
+                            event.type,
                           )} flex items-center justify-center`}
                         >
                           <i
                             className={`${getEventIcon(
-                              event.type
+                              event.type,
                             )} text-white text-sm`}
                           ></i>
                         </div>
@@ -1013,12 +1013,12 @@ export default function CalendarScreen() {
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-8 h-8 rounded-lg ${getEventColor(
-                          event.type
+                          event.type,
                         )} flex items-center justify-center`}
                       >
                         <i
                           className={`${getEventIcon(
-                            event.type
+                            event.type,
                           )} text-white text-sm`}
                         ></i>
                       </div>

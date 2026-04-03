@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import PaymentModal from "./PaymentModal";
+import PaymentModal from "./components/PaymentModal";
 import Sidebar from "@/src/components/Sidebar";
 import UserProfile from "@/src/components/UserProfile";
 
