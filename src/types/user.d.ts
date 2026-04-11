@@ -62,3 +62,20 @@ type UserType = {
   membershipId: string;
   role: string;
 };
+
+type UserResetPasswordRequest = {
+  token: string;
+  password: string;
+  confirmPassword: string;
+};
+
+type UserResetPasswordResponse = {
+  userStatus: string;
+  trialExpiresAt: string;
+  communityName: string;
+  membershipId: string;
+  message: string;
+  membershipStatus: string;
+  email: string;
+  communityStatus: string;
+};

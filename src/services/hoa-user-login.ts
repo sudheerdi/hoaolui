@@ -19,9 +19,20 @@ export const hoaUserLoginApi = createApi({
           method: "POST",
           body: { ...postBody },
         }),
-      }
+      },
     ),
+    hoaUserResetPassword: builder.mutation<
+      UserResetPasswordResponse,
+      UserResetPasswordRequest
+    >({
+      query: ({ ...postBody }) => ({
+        url: "reset-password",
+        method: "POST",
+        body: { ...postBody },
+      }),
+    }),
   }),
 });
 
-export const { useHoaUserLoginMutation } = hoaUserLoginApi;
+export const { useHoaUserLoginMutation, useHoaUserResetPasswordMutation } =
+  hoaUserLoginApi;
