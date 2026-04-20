@@ -28,7 +28,17 @@ export const hoaPollsApi = createApi({
         method: "GET",
       }),
     }),
+    submitPollVote: builder.mutation<void, string>({
+      query: (pollOptionId) => ({
+        url: `polls/vote?pollOptionId=${pollOptionId}`,
+        method: "POST",
+      }),
+    }),
   }),
 });
 
-export const { useCreatePollMutation, useLazyGetPollsQuery } = hoaPollsApi;
+export const {
+  useCreatePollMutation,
+  useLazyGetPollsQuery,
+  useSubmitPollVoteMutation,
+} = hoaPollsApi;

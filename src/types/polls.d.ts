@@ -28,4 +28,5 @@ type Poll = {
       poll: null;
     },
   ];
+  totalVotes: number;
 };

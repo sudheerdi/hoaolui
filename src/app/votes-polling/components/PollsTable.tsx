@@ -1,23 +1,18 @@
-
-interface Poll {
-  id: number;
-  topic: string;
-  type: string;
-  startDate: string;
-  endDate: string;
-  status: string;
-  totalVotes: number;
-  options: { name: string; votes: number; percentage: number }[];
-}
+import React from "react";
 
 interface PollsTableProps {
   polls: Poll[];
-  selectedPollIds: number[];
-  onPollClick: (pollId: number) => void;
-  activeTab: 'active' | 'closed';
+  selectedPollIds: string[];
+  onPollClick: (pollId: string) => void;
+  activeTab: "DRAFT" | "closed";
 }
 
-export default function PollsTable({ polls, selectedPollIds, onPollClick, activeTab }: PollsTableProps) {
+export default function PollsTable({
+  polls,
+  selectedPollIds,
+  onPollClick,
+  activeTab,
+}: PollsTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -44,18 +39,18 @@ export default function PollsTable({ polls, selectedPollIds, onPollClick, active
               onClick={() => onPollClick(poll.id)}
               className={`cursor-pointer transition-colors ${
                 selectedPollIds.includes(poll.id)
-                  ? 'bg-green-50 border-l-4 border-l-[#4D8555]'
-                  : 'hover:bg-gray-50'
+                  ? "bg-green-50 border-l-4 border-l-[#4D8555]"
+                  : "hover:bg-gray-50"
               }`}
             >
               <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                {poll.topic}
+                {poll.question}
               </td>
               <td className="px-6 py-4 text-sm text-gray-900 font-medium">
                 {poll.type}
               </td>
               <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                {poll.startDate}
+                {poll.createdOn}
               </td>
               <td className="px-6 py-4 text-sm text-gray-900 font-medium">
                 {poll.endDate}

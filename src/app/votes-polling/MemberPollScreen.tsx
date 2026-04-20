@@ -1,5 +1,5 @@
-import VotesTopBar from "./VotesTopBar";
-import VotesContent from "./VotesContent";
+import VotesTopBar from "./components/VotesTopBar";
+import VotesContent from "./components/VotesContent";
 
 export default function MemberPollScreen() {
   return (

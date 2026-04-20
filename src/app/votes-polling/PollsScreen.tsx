@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import UserProfile from "../../components/UserProfile";
 import { useLazyGetPollsQuery } from "@/src/services";
-import DashboardLayout from "@/src/components/layout/DashboardLayout";
 import CreatePollModal from "@/src/components/modals/CreatePollModal";
 
 export default function PollsScreen() {
@@ -19,10 +18,6 @@ export default function PollsScreen() {
 
   // Create poll popover state
   const [showCreatePopover, setShowCreatePopover] = useState(false);
-
-  const [activePolls, setActivePolls] = useState<Poll[] | undefined>([]);
-
-  const [closedPolls, setClosedPolls] = useState<Poll[] | undefined>([]);
 
   const [filteredPolls, setFilteredPolls] = useState<Poll[] | undefined>([]);
   const [selectedPollObjects, setSelectedPollObjects] = useState<
