@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import React from "react";
 import {
   useDeleteDocumentMutation,
   useLazyGetDocumenmtsQuery,
-  useLazyGetUnitsQuery,
+  useLazyGetMembersQuery,
   useShareDocumentMutation,
   useUploadDocumentMutation,
 } from "@/src/services";
 import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
-import { useAppDispatch } from "@/src/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/src/lib/hooks";
 
 interface Folder {
   id: string;
@@ -31,6 +31,8 @@ interface Folder {
 
 export default function DocumentationScreen() {
   const dispatch = useAppDispatch();
+
+  const { user } = useAppSelector((state) => state.hoaUser);
   const [getDocuments, { data: documentsData }] = useLazyGetDocumenmtsQuery();
   const [uploadDocument, { isLoading: isUploading }] =
     useUploadDocumentMutation();
@@ -38,7 +40,7 @@ export default function DocumentationScreen() {
     useDeleteDocumentMutation();
   const [shareHoaDocument, { isLoading: isSharing }] =
     useShareDocumentMutation();
-  const [getUnits, { data: unitsData }] = useLazyGetUnitsQuery();
+  const [getMembers, { data: membersData }] = useLazyGetMembersQuery();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<string>("all");
@@ -419,13 +421,13 @@ export default function DocumentationScreen() {
     if (!sharePopover.item || sharePopover.type === "folder") return;
     let allUsers: string[] = [];
     let selectedUsers: string[] = [];
-    if (unitsData && unitsData.units) {
-      allUsers = unitsData.units.map(
-        (unit: any) => unit.owners[0].userId || "",
+    if (membersData && membersData.members) {
+      allUsers = membersData.members.map(
+        (member: any) => member.membershipId || "",
       );
-      selectedUsers = unitsData.units
-        .filter((unit: any) => selectedEmails.includes(unit.owners[0].emailId))
-        .map((unit: any) => unit.owners[0].userId || "");
+      selectedUsers = membersData.members
+        .filter((member: any) => selectedEmails.includes(member.emailId))
+        .map((member: any) => member.membershipId || "");
     }
     try {
       await shareHoaDocument({
@@ -460,7 +462,8 @@ export default function DocumentationScreen() {
     if (sharePopover.type === "folder") {
       debugger;
       const allUsers =
-        unitsData?.units.map((unit: any) => unit.owners[0].userId || "") || [];
+        membersData?.members.map((member: any) => member.membershipId || "") ||
+        [];
       debugger;
       setFolders((prev) =>
         prev.map((folder) => {
@@ -557,14 +560,14 @@ export default function DocumentationScreen() {
 
   useEffect(() => {
     const emailSuggestions =
-      unitsData?.units.map((unit: any) => unit.owners[0].emailId || "") || [];
+      membersData?.members.map((member: any) => member.emailId || "") || [];
     const filtered = emailSuggestions.filter(
       (email: string) =>
         email.toLowerCase().includes(emailSearch.toLowerCase()) &&
         !selectedEmails.includes(email),
     );
     setFilteredEmailSuggestions(filtered);
-  }, [unitsData, emailSearch, selectedEmails]);
+  }, [membersData, emailSearch, selectedEmails]);
 
   const addEmail = (email: string) => {
     if (selectedEmails.length < 10 && !selectedEmails.includes(email)) {
@@ -631,7 +634,7 @@ export default function DocumentationScreen() {
 
   useEffect(() => {
     handleGetDocuments();
-    getUnits(null);
+    getMembers(null);
   }, []);
 
   return (
@@ -670,26 +673,28 @@ export default function DocumentationScreen() {
             <div className="p-4 border-b border-gray-200 flex-shrink-0">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-black">Folders</h3>
-                <div className="flex space-x-2">
-                  <input
-                    type="file"
-                    onChange={handleUploadFiles}
-                    className="hidden"
-                    id="file-upload"
-                    disabled={handleUploadButtonDisabled()}
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className={`px-3 py-2 rounded-lg text-base font-semibold transition-colors whitespace-nowrap ${
-                      selectedFolder === "all" || handleUploadButtonDisabled()
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-[#1FA372] text-white hover:bg-[#188f5f] transition-colors cursor-pointer"
-                    }`}
-                  >
-                    <i className="ri-upload-line mr-2"></i>
-                    Upload Files
-                  </label>
-                </div>
+                {user?.memberships[0]?.role === "COMMUNITY_ADMIN" && (
+                  <div className="flex space-x-2">
+                    <input
+                      type="file"
+                      onChange={handleUploadFiles}
+                      className="hidden"
+                      id="file-upload"
+                      disabled={handleUploadButtonDisabled()}
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className={`px-3 py-2 rounded-lg text-base font-semibold transition-colors whitespace-nowrap ${
+                        selectedFolder === "all" || handleUploadButtonDisabled()
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-[#1FA372] text-white hover:bg-[#188f5f] transition-colors cursor-pointer"
+                      }`}
+                    >
+                      <i className="ri-upload-line mr-2"></i>
+                      Upload Files
+                    </label>
+                  </div>
+                )}
               </div>
 
               {/* Table Headers */}
@@ -701,7 +706,9 @@ export default function DocumentationScreen() {
                 <div className="col-span-2">Documents</div>
                 <div className="col-span-2">Created By</div>
                 <div className="col-span-3">Updated By</div>
-                <div className="col-span-2">Privacy</div>
+                {user?.memberships[0]?.role === "COMMUNITY_ADMIN" && (
+                  <div className="col-span-2">Privacy</div>
+                )}
               </div>
             </div>
 
@@ -730,7 +737,9 @@ export default function DocumentationScreen() {
                   <div className="col-span-3 text-base font-medium text-black">
                     -
                   </div>
-                  <div className="col-span-2">-</div>
+                  {user?.memberships[0]?.role === "COMMUNITY_ADMIN" && (
+                    <div className="col-span-2">-</div>
+                  )}
                 </div>
 
                 {folders.map((folder) => (
@@ -777,24 +786,26 @@ export default function DocumentationScreen() {
                       <div className="col-span-3 text-base font-medium text-black">
                         {folder.updatedBy}
                       </div>
-                      <div className="col-span-2">
-                        <select
-                          value={folder.isPrivate ? "private" : "public"}
-                          onChange={(e) =>
-                            handlePrivacyChange(
-                              "folder",
-                              folder.id,
-                              e.target.value === "private",
-                              e as any,
-                            )
-                          }
-                          className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <option value="private">Private</option>
-                          <option value="public">Public</option>
-                        </select>
-                      </div>
+                      {user?.memberships[0]?.role === "COMMUNITY_ADMIN" && (
+                        <div className="col-span-2">
+                          <select
+                            value={folder.isPrivate ? "private" : "public"}
+                            onChange={(e) =>
+                              handlePrivacyChange(
+                                "folder",
+                                folder.id,
+                                e.target.value === "private",
+                                e as any,
+                              )
+                            }
+                            className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <option value="private">Private</option>
+                            <option value="public">Public</option>
+                          </select>
+                        </div>
+                      )}
                     </div>
 
                     {/* Subfolders */}
@@ -831,26 +842,29 @@ export default function DocumentationScreen() {
                               <div className="col-span-3 text-base font-medium text-black">
                                 {subfolder.updatedBy}
                               </div>
-                              <div className="col-span-2">
-                                <select
-                                  value={
-                                    subfolder.isPrivate ? "private" : "public"
-                                  }
-                                  onChange={(e) =>
-                                    handlePrivacyChange(
-                                      "folder",
-                                      subfolder.id,
-                                      e.target.value === "private",
-                                      e as any,
-                                    )
-                                  }
-                                  className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <option value="private">Private</option>
-                                  <option value="public">Public</option>
-                                </select>
-                              </div>
+                              {user?.memberships[0]?.role ===
+                                "COMMUNITY_ADMIN" && (
+                                <div className="col-span-2">
+                                  <select
+                                    value={
+                                      subfolder.isPrivate ? "private" : "public"
+                                    }
+                                    onChange={(e) =>
+                                      handlePrivacyChange(
+                                        "folder",
+                                        subfolder.id,
+                                        e.target.value === "private",
+                                        e as any,
+                                      )
+                                    }
+                                    className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <option value="private">Private</option>
+                                    <option value="public">Public</option>
+                                  </select>
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -921,56 +935,77 @@ export default function DocumentationScreen() {
                               ></i>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-base font-semibold text-black truncate">
+                              <h4 className="text-base font-semibold text-black truncate mb-2">
                                 {doc.title}
                               </h4>
+
+                              <div
+                                className="text-sm font-medium text-black space-y-1 mb-2"
+                                suppressHydrationWarning={true}
+                              >
+                                <div>
+                                  <span className="font-semibold">
+                                    Created:
+                                  </span>{" "}
+                                  {doc.uploadedBy.name}, {doc.uploadedAt}
+                                </div>
+                                <div>
+                                  <span className="font-semibold">
+                                    Updated:
+                                  </span>{" "}
+                                  {doc.lastModifiedBy.name},{" "}
+                                  {doc.lastModifiedAt}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteDocument(doc.id);
-                            }}
-                            className="p-1 hover:bg-red-100 rounded text-red-400 hover:text-red-600 flex-shrink-0"
-                          >
-                            <i className="ri-delete-bin-line text-base"></i>
-                          </button>
-                        </div>
-
-                        <div
-                          className="text-sm font-medium text-black space-y-1 mb-2"
-                          suppressHydrationWarning={true}
-                        >
-                          <div>
-                            <span className="font-semibold">Created:</span>{" "}
-                            {doc.uploadedBy.name}, {doc.uploadedAt}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Updated:</span>{" "}
-                            {doc.lastModifiedBy.name}, {doc.lastModifiedAt}
+                            {user?.memberships[0]?.role ===
+                            "COMMUNITY_ADMIN" ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteDocument(doc.id);
+                                }}
+                                className="p-1 hover:bg-red-100 rounded text-red-400 hover:text-red-600 flex-shrink-0"
+                              >
+                                <i className="ri-delete-bin-line text-base"></i>
+                              </button>
+                            ) : (
+                              <div className="flex flex-col items-end space-y-1">
+                                <button className="bg-[#1FA372] text-white px-3 py-1 rounded text-xs hover:bg-[#1A8C62] cursor-pointer whitespace-nowrap">
+                                  View
+                                </button>
+                                <button className="text-[#1FA372] hover:text-[#1A8C62] text-xs cursor-pointer whitespace-nowrap">
+                                  Download
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
 
-                        <div className="mt-2">
-                          <select
-                            value={
-                              doc.visibility === "SHARED" ? "public" : "private"
-                            }
-                            onChange={(e) =>
-                              handlePrivacyChange(
-                                "document",
-                                doc.id,
-                                e.target.value === "private",
-                                e as any,
-                              )
-                            }
-                            className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <option value="private">Private</option>
-                            <option value="public">Public</option>
-                          </select>
-                        </div>
+                        {user?.memberships[0]?.role === "COMMUNITY_ADMIN" && (
+                          <div className="mt-2 px-2">
+                            <select
+                              value={
+                                doc.visibility === "SHARED"
+                                  ? "public"
+                                  : "private"
+                              }
+                              onChange={(e) =>
+                                handlePrivacyChange(
+                                  "document",
+                                  doc.id,
+                                  e.target.value === "private",
+                                  e as any,
+                                )
+                              }
+                              className="w-full text-sm font-medium text-black border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <option value="private">Private</option>
+                              <option value="public">Public</option>
+                            </select>
+                          </div>
+                        )}
                       </div>
                     );
                   })}

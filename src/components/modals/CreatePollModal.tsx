@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useAppDispatch } from "@/src/lib/hooks";
-import { useCreatePollMutation } from "@/src/services";
+import { useCreatePollMutation, useActivePollMutation } from "@/src/services";
 import { setNotification } from "@/src/reducer/hoa-notificatio.reducer";
 
 interface SendViolationModalProps {
@@ -17,6 +17,7 @@ export default function SendViolationModal({
   const dispatch = useAppDispatch();
 
   const [createPoll] = useCreatePollMutation();
+  const [activePoll] = useActivePollMutation();
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [pollData, setPollData] = useState<PollsRequestType>({
@@ -64,7 +65,8 @@ export default function SendViolationModal({
     try {
       const requestData: PollsRequestType = { ...pollData };
       requestData.endDate = `${new Intl.DateTimeFormat("en-CA").format(new Date(pollData.endDate))}T23:59:00`;
-      await createPoll(requestData);
+      const result: any = await createPoll(requestData).unwrap();
+      await activePoll(result?.poll?.id).unwrap();
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);

@@ -9,7 +9,7 @@ export default function VotesContent() {
   const [getPolls, { data: pollsData, isSuccess }] = useLazyGetPollsQuery();
   const [submitPollVote] = useSubmitPollVoteMutation();
 
-  const [activeTab, setActiveTab] = useState<"DRAFT" | "closed">("DRAFT");
+  const [activeTab, setActiveTab] = useState<"ACTIVE" | "closed">("ACTIVE");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPollIds, setSelectedPollIds] = useState<string[]>([]); // Default first 3 polls selected for active
   const [selectedClosedPollId, setSelectedClosedPollId] = useState<string>(""); // Default first poll selected for closed
@@ -31,7 +31,7 @@ export default function VotesContent() {
   // Get selected polls for display with error handling
   const getSelectedPolls = () => {
     try {
-      if (activeTab === "DRAFT") {
+      if (activeTab === "ACTIVE") {
         const selected = activePolls.filter((poll) =>
           selectedPollIds.includes(poll.id),
         );
@@ -46,7 +46,7 @@ export default function VotesContent() {
       }
     } catch (error) {
       console.error("Error getting selected polls:", error);
-      return activeTab === "DRAFT"
+      return activeTab === "ACTIVE"
         ? activePolls.slice(0, 3)
         : closedPolls.slice(0, 1);
     }
@@ -151,7 +151,7 @@ export default function VotesContent() {
 
   const handlePollSelection = (pollId: string) => {
     try {
-      if (activeTab === "DRAFT") {
+      if (activeTab === "ACTIVE") {
         if (selectedPollIds.includes(pollId)) {
           // Prevent deselecting all polls - keep at least one selected
           if (selectedPollIds.length > 1) {
@@ -170,14 +170,14 @@ export default function VotesContent() {
     }
   };
 
-  const handleTabChange = (tab: "DRAFT" | "closed") => {
+  const handleTabChange = (tab: "ACTIVE" | "closed") => {
     try {
       setActiveTab(tab);
-      if (tab === "DRAFT") {
+      if (tab === "ACTIVE") {
         setSelectedPollIds(
           pollsData
             ? pollsData
-                .filter((poll) => poll.status === "DRAFT")
+                .filter((poll) => poll.status === "ACTIVE")
                 .slice(0, 3)
                 .map((poll) => poll.id)
             : [],
@@ -251,14 +251,14 @@ export default function VotesContent() {
       ),
     }));
     setActivePolls(
-      pollsWithTotalVotes.filter((poll) => poll.status === "DRAFT"),
+      pollsWithTotalVotes.filter((poll) => poll.status === "ACTIVE"),
     );
     setClosedPolls(
       pollsWithTotalVotes.filter((poll) => poll.status === "closed"),
     );
     setSelectedPollIds(
       pollsWithTotalVotes
-        .filter((poll) => poll.status === "DRAFT")
+        .filter((poll) => poll.status === "ACTIVE")
         .slice(0, 3)
         .map((poll) => poll.id),
     );
@@ -309,7 +309,7 @@ export default function VotesContent() {
                   const colors = ["#1FA372", "#4CAF8F", "#7DBFA3"];
                   const isVoted = votedPolls[poll.id] === option.id;
                   const isPollVoted = !!votedPolls[poll.id];
-                  const isActive = activeTab === "DRAFT";
+                  const isActive = activeTab === "ACTIVE";
 
                   return (
                     <div key={index} className="space-y-1">
@@ -420,9 +420,9 @@ export default function VotesContent() {
         <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex space-x-1">
             <button
-              onClick={() => handleTabChange("DRAFT")}
+              onClick={() => handleTabChange("ACTIVE")}
               className={`px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
-                activeTab === "DRAFT"
+                activeTab === "ACTIVE"
                   ? "bg-[#1FA372] text-white"
                   : "text-gray-900 font-semibold hover:text-gray-900"
               }`}
@@ -456,9 +456,9 @@ export default function VotesContent() {
         {/* Table with fixed height and scroll */}
         <div className="flex-1 overflow-y-auto min-h-0">
           <PollsTable
-            polls={activeTab === "DRAFT" ? filteredPolls : paginatedPolls}
+            polls={activeTab === "ACTIVE" ? filteredPolls : paginatedPolls}
             selectedPollIds={
-              activeTab === "DRAFT" ? selectedPollIds : [selectedClosedPollId]
+              activeTab === "ACTIVE" ? selectedPollIds : [selectedClosedPollId]
             }
             onPollClick={handlePollSelection}
             activeTab={activeTab}

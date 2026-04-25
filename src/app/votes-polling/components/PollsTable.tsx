@@ -4,7 +4,7 @@ interface PollsTableProps {
   polls: Poll[];
   selectedPollIds: string[];
   onPollClick: (pollId: string) => void;
-  activeTab: "DRAFT" | "closed";
+  activeTab: "ACTIVE" | "closed";
 }
 
 export default function PollsTable({

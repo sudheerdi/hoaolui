@@ -6,7 +6,7 @@ const base = "http://localhost:8080/api";
 export const hoaUserSearchApi = createApi({
   reducerPath: "hoaUserSearch",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${base}/community/members/`,
+    baseUrl: `${base}/community/`,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).hoaUser.token;
       headers.set("Authorization", `Bearer ${token}`);
@@ -17,12 +17,19 @@ export const hoaUserSearchApi = createApi({
   endpoints: (builder) => ({
     getUsers: builder.query<any, any>({
       query: (address) => ({
-        url: "search",
+        url: "members/search",
         method: "GET",
         params: { address },
+      }),
+    }),
+    getMembers: builder.query<any, any>({
+      query: () => ({
+        url: "members",
+        method: "GET",
       }),
     }),
   }),
 });
 
-export const { useLazyGetUsersQuery } = hoaUserSearchApi;
+export const { useLazyGetUsersQuery, useLazyGetMembersQuery } =
+  hoaUserSearchApi;

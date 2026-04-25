@@ -22,6 +22,12 @@ export const hoaPollsApi = createApi({
         body: requstData,
       }),
     }),
+    activePoll: builder.mutation<PollsRequestType, any>({
+      query: (pollId) => ({
+        url: `polls/${pollId}/activate`,
+        method: "PUT",
+      }),
+    }),
     getPolls: builder.query<Poll[], void>({
       query: () => ({
         url: "polls",
@@ -39,6 +45,7 @@ export const hoaPollsApi = createApi({
 
 export const {
   useCreatePollMutation,
+  useActivePollMutation,
   useLazyGetPollsQuery,
   useSubmitPollVoteMutation,
 } = hoaPollsApi;
